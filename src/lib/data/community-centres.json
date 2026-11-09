@@ -1,0 +1,1274 @@
+{
+ "sources": {
+  "facilities": "City of Toronto Open Data - Parks and Recreation Facilities",
+  "neighbourhoods": "City of Toronto Open Data - Neighbourhoods (158)",
+  "survey": "Tables 3-6 (weighted), Q3 sense of belonging"
+ },
+ "totalCentres": 277,
+ "neighbourhoods": [
+  {
+   "name": "Agincourt North",
+   "centres": 4,
+   "base": 53,
+   "unweighted": 49,
+   "strong": 50.943396226415096,
+   "weak": 35.84905660377358
+  },
+  {
+   "name": "Agincourt South-Malvern West",
+   "centres": 4,
+   "base": 42,
+   "unweighted": 39,
+   "strong": 33.33333333333333,
+   "weak": 54.761904761904766
+  },
+  {
+   "name": "Alderwood",
+   "centres": 4,
+   "base": 46,
+   "unweighted": 49,
+   "strong": 47.82608695652174,
+   "weak": 47.82608695652174
+  },
+  {
+   "name": "Annex",
+   "centres": 1,
+   "base": 48,
+   "unweighted": 45,
+   "strong": 43.75,
+   "weak": 54.166666666666664
+  },
+  {
+   "name": "Avondale",
+   "centres": 1,
+   "base": 44,
+   "unweighted": 42,
+   "strong": 31.818181818181817,
+   "weak": 61.36363636363637
+  },
+  {
+   "name": "Banbury-Don Mills",
+   "centres": 2,
+   "base": 52,
+   "unweighted": 53,
+   "strong": 46.15384615384615,
+   "weak": 38.46153846153847
+  },
+  {
+   "name": "Bathurst Manor",
+   "centres": 1,
+   "base": 39,
+   "unweighted": 40,
+   "strong": 41.02564102564102,
+   "weak": 51.28205128205128
+  },
+  {
+   "name": "Bay-Cloverhill",
+   "centres": 0,
+   "base": 38,
+   "unweighted": 38,
+   "strong": 36.84210526315789,
+   "weak": 57.89473684210527
+  },
+  {
+   "name": "Bayview Village",
+   "centres": 1,
+   "base": 45,
+   "unweighted": 47,
+   "strong": 33.33333333333333,
+   "weak": 60.0
+  },
+  {
+   "name": "Bayview Woods-Steeles",
+   "centres": 1,
+   "base": 51,
+   "unweighted": 54,
+   "strong": 54.90196078431373,
+   "weak": 43.13725490196079
+  },
+  {
+   "name": "Bedford Park-Nortown",
+   "centres": 1,
+   "base": 57,
+   "unweighted": 54,
+   "strong": 64.91228070175438,
+   "weak": 33.33333333333333
+  },
+  {
+   "name": "Beechborough-Greenbrook",
+   "centres": 1,
+   "base": 24,
+   "unweighted": 25,
+   "strong": 33.33333333333333,
+   "weak": 54.166666666666664
+  },
+  {
+   "name": "Bendale South",
+   "centres": 0,
+   "base": 49,
+   "unweighted": 47,
+   "strong": 44.89795918367347,
+   "weak": 51.02040816326531
+  },
+  {
+   "name": "Bendale-Glen Andrew",
+   "centres": 2,
+   "base": 44,
+   "unweighted": 41,
+   "strong": 59.09090909090909,
+   "weak": 34.090909090909086
+  },
+  {
+   "name": "Birchcliffe-Cliffside",
+   "centres": 4,
+   "base": 45,
+   "unweighted": 47,
+   "strong": 57.77777777777777,
+   "weak": 37.77777777777778
+  },
+  {
+   "name": "Black Creek",
+   "centres": 4,
+   "base": 43,
+   "unweighted": 37,
+   "strong": 62.7906976744186,
+   "weak": 34.883720930232556
+  },
+  {
+   "name": "Blake-Jones",
+   "centres": 0,
+   "base": 58,
+   "unweighted": 61,
+   "strong": 63.793103448275865,
+   "weak": 29.310344827586203
+  },
+  {
+   "name": "Briar Hill-Belgravia",
+   "centres": 0,
+   "base": 38,
+   "unweighted": 39,
+   "strong": 34.21052631578947,
+   "weak": 63.1578947368421
+  },
+  {
+   "name": "Bridle Path-Sunnybrook-York Mills",
+   "centres": 1,
+   "base": 44,
+   "unweighted": 47,
+   "strong": 61.36363636363637,
+   "weak": 31.818181818181817
+  },
+  {
+   "name": "Broadview North",
+   "centres": 0,
+   "base": 51,
+   "unweighted": 53,
+   "strong": 54.90196078431373,
+   "weak": 43.13725490196079
+  },
+  {
+   "name": "Brookhaven-Amesbury",
+   "centres": 2,
+   "base": 36,
+   "unweighted": 34,
+   "strong": 50.0,
+   "weak": 44.44444444444444
+  },
+  {
+   "name": "Cabbagetown-South St.James Town",
+   "centres": 0,
+   "base": 55,
+   "unweighted": 56,
+   "strong": 41.81818181818181,
+   "weak": 52.72727272727272
+  },
+  {
+   "name": "Caledonia-Fairbank",
+   "centres": 1,
+   "base": 35,
+   "unweighted": 34,
+   "strong": 42.857142857142854,
+   "weak": 48.57142857142857
+  },
+  {
+   "name": "Casa Loma",
+   "centres": 2,
+   "base": 42,
+   "unweighted": 46,
+   "strong": 59.523809523809526,
+   "weak": 30.952380952380953
+  },
+  {
+   "name": "Centennial Scarborough",
+   "centres": 3,
+   "base": 59,
+   "unweighted": 64,
+   "strong": 66.10169491525424,
+   "weak": 32.20338983050847
+  },
+  {
+   "name": "Church-Wellesley",
+   "centres": 0,
+   "base": 50,
+   "unweighted": 47,
+   "strong": 57.99999999999999,
+   "weak": 42.0
+  },
+  {
+   "name": "Clairlea-Birchmount",
+   "centres": 2,
+   "base": 51,
+   "unweighted": 48,
+   "strong": 49.01960784313725,
+   "weak": 41.17647058823529
+  },
+  {
+   "name": "Clanton Park",
+   "centres": 1,
+   "base": 45,
+   "unweighted": 44,
+   "strong": 28.888888888888886,
+   "weak": 60.0
+  },
+  {
+   "name": "Cliffcrest",
+   "centres": 2,
+   "base": 40,
+   "unweighted": 40,
+   "strong": 60.0,
+   "weak": 37.5
+  },
+  {
+   "name": "Corso Italia-Davenport",
+   "centres": 1,
+   "base": 63,
+   "unweighted": 63,
+   "strong": 55.55555555555556,
+   "weak": 41.269841269841265
+  },
+  {
+   "name": "Danforth",
+   "centres": 1,
+   "base": 61,
+   "unweighted": 66,
+   "strong": 70.49180327868852,
+   "weak": 22.950819672131146
+  },
+  {
+   "name": "Danforth East York",
+   "centres": 0,
+   "base": 60,
+   "unweighted": 62,
+   "strong": 56.666666666666664,
+   "weak": 41.66666666666667
+  },
+  {
+   "name": "Don Valley Village",
+   "centres": 3,
+   "base": 51,
+   "unweighted": 49,
+   "strong": 27.450980392156865,
+   "weak": 60.78431372549019
+  },
+  {
+   "name": "Dorset Park",
+   "centres": 4,
+   "base": 45,
+   "unweighted": 42,
+   "strong": 57.77777777777777,
+   "weak": 35.55555555555556
+  },
+  {
+   "name": "Dovercourt Village",
+   "centres": 0,
+   "base": 55,
+   "unweighted": 56,
+   "strong": 50.90909090909091,
+   "weak": 41.81818181818181
+  },
+  {
+   "name": "Downsview",
+   "centres": 1,
+   "base": 39,
+   "unweighted": 37,
+   "strong": 35.8974358974359,
+   "weak": 64.1025641025641
+  },
+  {
+   "name": "Downtown Yonge East",
+   "centres": 0,
+   "base": 41,
+   "unweighted": 39,
+   "strong": 36.58536585365854,
+   "weak": 56.09756097560976
+  },
+  {
+   "name": "Dufferin Grove",
+   "centres": 0,
+   "base": 43,
+   "unweighted": 47,
+   "strong": 58.139534883720934,
+   "weak": 37.2093023255814
+  },
+  {
+   "name": "East End-Danforth",
+   "centres": 3,
+   "base": 53,
+   "unweighted": 55,
+   "strong": 49.056603773584904,
+   "weak": 41.509433962264154
+  },
+  {
+   "name": "East L Amoreaux",
+   "centres": 2,
+   "base": 45,
+   "unweighted": 44,
+   "strong": 44.44444444444444,
+   "weak": 42.22222222222222
+  },
+  {
+   "name": "East Willowdale",
+   "centres": 2,
+   "base": 40,
+   "unweighted": 42,
+   "strong": 55.00000000000001,
+   "weak": 35.0
+  },
+  {
+   "name": "Edenbridge-Humber Valley",
+   "centres": 2,
+   "base": 34,
+   "unweighted": 35,
+   "strong": 61.76470588235294,
+   "weak": 35.294117647058826
+  },
+  {
+   "name": "Eglinton East",
+   "centres": 3,
+   "base": 39,
+   "unweighted": 37,
+   "strong": 53.84615384615385,
+   "weak": 38.46153846153847
+  },
+  {
+   "name": "Elms-Old Rexdale",
+   "centres": 2,
+   "base": 28,
+   "unweighted": 26,
+   "strong": 60.71428571428571,
+   "weak": 39.285714285714285
+  },
+  {
+   "name": "Englemount-Lawrence",
+   "centres": 4,
+   "base": 40,
+   "unweighted": 40,
+   "strong": 52.5,
+   "weak": 37.5
+  },
+  {
+   "name": "Eringate-Centennial-West Deane",
+   "centres": 4,
+   "base": 50,
+   "unweighted": 53,
+   "strong": 50.0,
+   "weak": 38.0
+  },
+  {
+   "name": "Etobicoke City Centre",
+   "centres": 1,
+   "base": 42,
+   "unweighted": 41,
+   "strong": 33.33333333333333,
+   "weak": 54.761904761904766
+  },
+  {
+   "name": "Etobicoke West Mall",
+   "centres": 0,
+   "base": 41,
+   "unweighted": 42,
+   "strong": 36.58536585365854,
+   "weak": 48.78048780487805
+  },
+  {
+   "name": "Fenside-Parkwoods",
+   "centres": 2,
+   "base": 46,
+   "unweighted": 45,
+   "strong": 41.30434782608695,
+   "weak": 54.347826086956516
+  },
+  {
+   "name": "Flemingdon Park",
+   "centres": 3,
+   "base": 47,
+   "unweighted": 42,
+   "strong": 31.914893617021278,
+   "weak": 57.446808510638306
+  },
+  {
+   "name": "Forest Hill North",
+   "centres": 1,
+   "base": 39,
+   "unweighted": 41,
+   "strong": 46.15384615384615,
+   "weak": 38.46153846153847
+  },
+  {
+   "name": "Forest Hill South",
+   "centres": 0,
+   "base": 42,
+   "unweighted": 42,
+   "strong": 50.0,
+   "weak": 45.23809523809524
+  },
+  {
+   "name": "Fort York-Liberty Village",
+   "centres": 0,
+   "base": 45,
+   "unweighted": 42,
+   "strong": 40.0,
+   "weak": 57.77777777777777
+  },
+  {
+   "name": "Glenfield-Jane Heights",
+   "centres": 7,
+   "base": 46,
+   "unweighted": 42,
+   "strong": 58.69565217391305,
+   "weak": 34.78260869565217
+  },
+  {
+   "name": "Golfdale-Cedarbrae-Woburn",
+   "centres": 3,
+   "base": 44,
+   "unweighted": 44,
+   "strong": 52.27272727272727,
+   "weak": 38.63636363636363
+  },
+  {
+   "name": "Greenwood-Coxwell",
+   "centres": 2,
+   "base": 48,
+   "unweighted": 47,
+   "strong": 60.416666666666664,
+   "weak": 39.58333333333333
+  },
+  {
+   "name": "Guildwood",
+   "centres": 2,
+   "base": 47,
+   "unweighted": 50,
+   "strong": 65.95744680851064,
+   "weak": 31.914893617021278
+  },
+  {
+   "name": "Harbourfront-CityPlace",
+   "centres": 1,
+   "base": 41,
+   "unweighted": 37,
+   "strong": 41.46341463414634,
+   "weak": 48.78048780487805
+  },
+  {
+   "name": "Henry Farm",
+   "centres": 1,
+   "base": 53,
+   "unweighted": 49,
+   "strong": 58.490566037735846,
+   "weak": 35.84905660377358
+  },
+  {
+   "name": "High Park North",
+   "centres": 2,
+   "base": 54,
+   "unweighted": 56,
+   "strong": 48.148148148148145,
+   "weak": 40.74074074074074
+  },
+  {
+   "name": "High Park-Swansea",
+   "centres": 1,
+   "base": 49,
+   "unweighted": 52,
+   "strong": 69.38775510204081,
+   "weak": 28.57142857142857
+  },
+  {
+   "name": "Highland Creek",
+   "centres": 2,
+   "base": 43,
+   "unweighted": 45,
+   "strong": 51.162790697674424,
+   "weak": 32.55813953488372
+  },
+  {
+   "name": "Hillcrest Village",
+   "centres": 1,
+   "base": 46,
+   "unweighted": 47,
+   "strong": 45.65217391304348,
+   "weak": 50.0
+  },
+  {
+   "name": "Humber Bay Shores",
+   "centres": 0,
+   "base": 43,
+   "unweighted": 44,
+   "strong": 37.2093023255814,
+   "weak": 60.46511627906976
+  },
+  {
+   "name": "Humber Heights-Westmount",
+   "centres": 0,
+   "base": 39,
+   "unweighted": 42,
+   "strong": 41.02564102564102,
+   "weak": 48.717948717948715
+  },
+  {
+   "name": "Humber Summit",
+   "centres": 1,
+   "base": 34,
+   "unweighted": 33,
+   "strong": 35.294117647058826,
+   "weak": 38.23529411764706
+  },
+  {
+   "name": "Humbermede",
+   "centres": 3,
+   "base": 24,
+   "unweighted": 24,
+   "strong": 66.66666666666666,
+   "weak": 29.166666666666668
+  },
+  {
+   "name": "Humewood-Cedarvale",
+   "centres": 1,
+   "base": 47,
+   "unweighted": 48,
+   "strong": 51.06382978723404,
+   "weak": 44.680851063829785
+  },
+  {
+   "name": "Ionview",
+   "centres": 0,
+   "base": 35,
+   "unweighted": 36,
+   "strong": 42.857142857142854,
+   "weak": 51.42857142857142
+  },
+  {
+   "name": "Islington",
+   "centres": 2,
+   "base": 50,
+   "unweighted": 52,
+   "strong": 62.0,
+   "weak": 36.0
+  },
+  {
+   "name": "Junction Area",
+   "centres": 0,
+   "base": 46,
+   "unweighted": 46,
+   "strong": 52.17391304347826,
+   "weak": 45.65217391304348
+  },
+  {
+   "name": "Junction-Wallace Emerson",
+   "centres": 1,
+   "base": 57,
+   "unweighted": 55,
+   "strong": 40.35087719298245,
+   "weak": 52.63157894736842
+  },
+  {
+   "name": "Keelesdale-Eglinton West",
+   "centres": 2,
+   "base": 30,
+   "unweighted": 30,
+   "strong": 36.666666666666664,
+   "weak": 50.0
+  },
+  {
+   "name": "Kennedy Park",
+   "centres": 3,
+   "base": 36,
+   "unweighted": 36,
+   "strong": 36.11111111111111,
+   "weak": 52.77777777777778
+  },
+  {
+   "name": "Kensington-Chinatown",
+   "centres": 2,
+   "base": 38,
+   "unweighted": 36,
+   "strong": 63.1578947368421,
+   "weak": 34.21052631578947
+  },
+  {
+   "name": "Kingsview Village-The Westway",
+   "centres": 2,
+   "base": 39,
+   "unweighted": 40,
+   "strong": 38.46153846153847,
+   "weak": 53.84615384615385
+  },
+  {
+   "name": "Kingsway South",
+   "centres": 3,
+   "base": 65,
+   "unweighted": 71,
+   "strong": 73.84615384615385,
+   "weak": 21.53846153846154
+  },
+  {
+   "name": "L Amoreaux West",
+   "centres": 1,
+   "base": 43,
+   "unweighted": 44,
+   "strong": 51.162790697674424,
+   "weak": 37.2093023255814
+  },
+  {
+   "name": "Lambton Baby Point",
+   "centres": 1,
+   "base": 55,
+   "unweighted": 61,
+   "strong": 83.63636363636363,
+   "weak": 16.363636363636363
+  },
+  {
+   "name": "Lansing-Westgate",
+   "centres": 2,
+   "base": 47,
+   "unweighted": 48,
+   "strong": 65.95744680851064,
+   "weak": 34.04255319148936
+  },
+  {
+   "name": "Lawrence Park North",
+   "centres": 1,
+   "base": 73,
+   "unweighted": 79,
+   "strong": 67.12328767123287,
+   "weak": 31.506849315068493
+  },
+  {
+   "name": "Lawrence Park South",
+   "centres": 0,
+   "base": 47,
+   "unweighted": 50,
+   "strong": 61.702127659574465,
+   "weak": 34.04255319148936
+  },
+  {
+   "name": "Leaside-Bennington",
+   "centres": 4,
+   "base": 66,
+   "unweighted": 70,
+   "strong": 60.60606060606061,
+   "weak": 34.84848484848485
+  },
+  {
+   "name": "Little Portugal",
+   "centres": 2,
+   "base": 43,
+   "unweighted": 41,
+   "strong": 41.86046511627907,
+   "weak": 55.81395348837209
+  },
+  {
+   "name": "Long Branch",
+   "centres": 2,
+   "base": 46,
+   "unweighted": 50,
+   "strong": 52.17391304347826,
+   "weak": 45.65217391304348
+  },
+  {
+   "name": "Malvern East",
+   "centres": 2,
+   "base": 45,
+   "unweighted": 42,
+   "strong": 60.0,
+   "weak": 35.55555555555556
+  },
+  {
+   "name": "Malvern West",
+   "centres": 3,
+   "base": 36,
+   "unweighted": 35,
+   "strong": 58.333333333333336,
+   "weak": 30.555555555555557
+  },
+  {
+   "name": "Maple Leaf",
+   "centres": 0,
+   "base": 28,
+   "unweighted": 28,
+   "strong": 57.14285714285714,
+   "weak": 42.857142857142854
+  },
+  {
+   "name": "Markland Wood",
+   "centres": 1,
+   "base": 54,
+   "unweighted": 58,
+   "strong": 64.81481481481481,
+   "weak": 29.629629629629626
+  },
+  {
+   "name": "Milliken",
+   "centres": 2,
+   "base": 46,
+   "unweighted": 48,
+   "strong": 45.65217391304348,
+   "weak": 39.130434782608695
+  },
+  {
+   "name": "Mimico-Queensway",
+   "centres": 4,
+   "base": 42,
+   "unweighted": 44,
+   "strong": 33.33333333333333,
+   "weak": 59.523809523809526
+  },
+  {
+   "name": "Morningside",
+   "centres": 5,
+   "base": 40,
+   "unweighted": 37,
+   "strong": 60.0,
+   "weak": 27.500000000000004
+  },
+  {
+   "name": "Morningside Heights",
+   "centres": 1,
+   "base": 42,
+   "unweighted": 40,
+   "strong": 47.61904761904761,
+   "weak": 38.095238095238095
+  },
+  {
+   "name": "Moss Park",
+   "centres": 2,
+   "base": 55,
+   "unweighted": 52,
+   "strong": 47.27272727272727,
+   "weak": 40.0
+  },
+  {
+   "name": "Mount Dennis",
+   "centres": 1,
+   "base": 30,
+   "unweighted": 31,
+   "strong": 33.33333333333333,
+   "weak": 46.666666666666664
+  },
+  {
+   "name": "Mount Olive-Silverstone-Jamestown",
+   "centres": 6,
+   "base": 44,
+   "unweighted": 41,
+   "strong": 59.09090909090909,
+   "weak": 38.63636363636363
+  },
+  {
+   "name": "Mount Pleasant East",
+   "centres": 1,
+   "base": 58,
+   "unweighted": 61,
+   "strong": 51.724137931034484,
+   "weak": 43.103448275862064
+  },
+  {
+   "name": "New Toronto",
+   "centres": 6,
+   "base": 43,
+   "unweighted": 43,
+   "strong": 51.162790697674424,
+   "weak": 46.51162790697674
+  },
+  {
+   "name": "Newtonbrook East",
+   "centres": 1,
+   "base": 40,
+   "unweighted": 39,
+   "strong": 37.5,
+   "weak": 52.5
+  },
+  {
+   "name": "Newtonbrook West",
+   "centres": 2,
+   "base": 40,
+   "unweighted": 40,
+   "strong": 42.5,
+   "weak": 52.5
+  },
+  {
+   "name": "North Riverdale",
+   "centres": 2,
+   "base": 59,
+   "unweighted": 63,
+   "strong": 62.71186440677966,
+   "weak": 35.59322033898305
+  },
+  {
+   "name": "North St.James Town",
+   "centres": 1,
+   "base": 57,
+   "unweighted": 52,
+   "strong": 50.877192982456144,
+   "weak": 43.859649122807014
+  },
+  {
+   "name": "North Toronto",
+   "centres": 0,
+   "base": 38,
+   "unweighted": 38,
+   "strong": 34.21052631578947,
+   "weak": 57.89473684210527
+  },
+  {
+   "name": "O Connor-Parkview",
+   "centres": 3,
+   "base": 42,
+   "unweighted": 42,
+   "strong": 45.23809523809524,
+   "weak": 40.476190476190474
+  },
+  {
+   "name": "Oakdale-Beverley Heights",
+   "centres": 4,
+   "base": 36,
+   "unweighted": 34,
+   "strong": 58.333333333333336,
+   "weak": 33.33333333333333
+  },
+  {
+   "name": "Oakridge",
+   "centres": 2,
+   "base": 34,
+   "unweighted": 31,
+   "strong": 47.05882352941176,
+   "weak": 38.23529411764706
+  },
+  {
+   "name": "Oakwood Village",
+   "centres": 2,
+   "base": 37,
+   "unweighted": 36,
+   "strong": 40.54054054054054,
+   "weak": 51.35135135135135
+  },
+  {
+   "name": "Old East York",
+   "centres": 2,
+   "base": 54,
+   "unweighted": 59,
+   "strong": 42.592592592592595,
+   "weak": 51.85185185185185
+  },
+  {
+   "name": "Palmerston-Little Italy",
+   "centres": 2,
+   "base": 59,
+   "unweighted": 57,
+   "strong": 40.67796610169492,
+   "weak": 55.932203389830505
+  },
+  {
+   "name": "Parkwoods-O Connor Hills",
+   "centres": 1,
+   "base": 51,
+   "unweighted": 51,
+   "strong": 49.01960784313725,
+   "weak": 43.13725490196079
+  },
+  {
+   "name": "Pelmo Park-Humberlea",
+   "centres": 1,
+   "base": 40,
+   "unweighted": 40,
+   "strong": 32.5,
+   "weak": 62.5
+  },
+  {
+   "name": "Playter Estates-Danforth",
+   "centres": 0,
+   "base": 59,
+   "unweighted": 63,
+   "strong": 66.10169491525424,
+   "weak": 27.11864406779661
+  },
+  {
+   "name": "Pleasant View",
+   "centres": 2,
+   "base": 40,
+   "unweighted": 43,
+   "strong": 35.0,
+   "weak": 57.49999999999999
+  },
+  {
+   "name": "Princess-Rosethorn",
+   "centres": 1,
+   "base": 46,
+   "unweighted": 51,
+   "strong": 58.69565217391305,
+   "weak": 28.26086956521739
+  },
+  {
+   "name": "Regent Park",
+   "centres": 2,
+   "base": 33,
+   "unweighted": 34,
+   "strong": 30.303030303030305,
+   "weak": 60.60606060606061
+  },
+  {
+   "name": "Rexdale-Kipling",
+   "centres": 1,
+   "base": 35,
+   "unweighted": 36,
+   "strong": 42.857142857142854,
+   "weak": 51.42857142857142
+  },
+  {
+   "name": "Rockcliffe-Smythe",
+   "centres": 2,
+   "base": 42,
+   "unweighted": 41,
+   "strong": 54.761904761904766,
+   "weak": 42.857142857142854
+  },
+  {
+   "name": "Roncesvalles",
+   "centres": 1,
+   "base": 44,
+   "unweighted": 46,
+   "strong": 59.09090909090909,
+   "weak": 36.36363636363637
+  },
+  {
+   "name": "Rosedale-Moore Park",
+   "centres": 0,
+   "base": 46,
+   "unweighted": 45,
+   "strong": 41.30434782608695,
+   "weak": 54.347826086956516
+  },
+  {
+   "name": "Runnymede-Bloor West Village",
+   "centres": 2,
+   "base": 69,
+   "unweighted": 75,
+   "strong": 76.81159420289855,
+   "weak": 21.73913043478261
+  },
+  {
+   "name": "Rustic",
+   "centres": 1,
+   "base": 29,
+   "unweighted": 29,
+   "strong": 48.275862068965516,
+   "weak": 41.37931034482759
+  },
+  {
+   "name": "Scarborough Village",
+   "centres": 2,
+   "base": 41,
+   "unweighted": 42,
+   "strong": 48.78048780487805,
+   "weak": 39.02439024390244
+  },
+  {
+   "name": "South Eglinton-Davisville",
+   "centres": 1,
+   "base": 45,
+   "unweighted": 43,
+   "strong": 37.77777777777778,
+   "weak": 57.77777777777777
+  },
+  {
+   "name": "South Parkdale",
+   "centres": 3,
+   "base": 45,
+   "unweighted": 43,
+   "strong": 37.77777777777778,
+   "weak": 51.11111111111111
+  },
+  {
+   "name": "South Riverdale",
+   "centres": 3,
+   "base": 50,
+   "unweighted": 51,
+   "strong": 56.00000000000001,
+   "weak": 44.0
+  },
+  {
+   "name": "St Lawrence-East Bayfront-The Islands",
+   "centres": 4,
+   "base": 50,
+   "unweighted": 49,
+   "strong": 40.0,
+   "weak": 56.00000000000001
+  },
+  {
+   "name": "St.Andrew-Windfields",
+   "centres": 2,
+   "base": 40,
+   "unweighted": 42,
+   "strong": 45.0,
+   "weak": 45.0
+  },
+  {
+   "name": "Steeles",
+   "centres": 2,
+   "base": 48,
+   "unweighted": 49,
+   "strong": 41.66666666666667,
+   "weak": 54.166666666666664
+  },
+  {
+   "name": "Stonegate-Queensway",
+   "centres": 3,
+   "base": 56,
+   "unweighted": 56,
+   "strong": 62.5,
+   "weak": 32.142857142857146
+  },
+  {
+   "name": "Tam O Shanter-Sullivan",
+   "centres": 3,
+   "base": 55,
+   "unweighted": 53,
+   "strong": 47.27272727272727,
+   "weak": 45.45454545454545
+  },
+  {
+   "name": "Taylor-Massey",
+   "centres": 1,
+   "base": 48,
+   "unweighted": 44,
+   "strong": 58.333333333333336,
+   "weak": 37.5
+  },
+  {
+   "name": "The Beaches",
+   "centres": 1,
+   "base": 50,
+   "unweighted": 53,
+   "strong": 64.0,
+   "weak": 32.0
+  },
+  {
+   "name": "Thistletown-Beaumond Heights",
+   "centres": 1,
+   "base": 32,
+   "unweighted": 32,
+   "strong": 56.25,
+   "weak": 15.625
+  },
+  {
+   "name": "Thorncliffe Park",
+   "centres": 1,
+   "base": 42,
+   "unweighted": 41,
+   "strong": 50.0,
+   "weak": 42.857142857142854
+  },
+  {
+   "name": "Trinity-Bellwoods",
+   "centres": 1,
+   "base": 52,
+   "unweighted": 48,
+   "strong": 69.23076923076923,
+   "weak": 28.846153846153843
+  },
+  {
+   "name": "University",
+   "centres": 0,
+   "base": 34,
+   "unweighted": 35,
+   "strong": 58.82352941176471,
+   "weak": 35.294117647058826
+  },
+  {
+   "name": "Victoria Village",
+   "centres": 4,
+   "base": 44,
+   "unweighted": 45,
+   "strong": 54.54545454545454,
+   "weak": 40.909090909090914
+  },
+  {
+   "name": "Wellington Place",
+   "centres": 0,
+   "base": 40,
+   "unweighted": 36,
+   "strong": 22.5,
+   "weak": 70.0
+  },
+  {
+   "name": "West Hill",
+   "centres": 2,
+   "base": 52,
+   "unweighted": 49,
+   "strong": 44.230769230769226,
+   "weak": 36.53846153846153
+  },
+  {
+   "name": "West Humber-Clairville",
+   "centres": 2,
+   "base": 51,
+   "unweighted": 45,
+   "strong": 58.82352941176471,
+   "weak": 35.294117647058826
+  },
+  {
+   "name": "West Queen West",
+   "centres": 0,
+   "base": 46,
+   "unweighted": 44,
+   "strong": 30.434782608695656,
+   "weak": 60.86956521739131
+  },
+  {
+   "name": "West Rouge",
+   "centres": 2,
+   "base": 57,
+   "unweighted": 57,
+   "strong": 50.877192982456144,
+   "weak": 42.10526315789473
+  },
+  {
+   "name": "Westminster-Branson",
+   "centres": 4,
+   "base": 39,
+   "unweighted": 40,
+   "strong": 41.02564102564102,
+   "weak": 53.84615384615385
+  },
+  {
+   "name": "Weston",
+   "centres": 2,
+   "base": 32,
+   "unweighted": 31,
+   "strong": 40.625,
+   "weak": 56.25
+  },
+  {
+   "name": "Weston-Pelham Park",
+   "centres": 0,
+   "base": 48,
+   "unweighted": 48,
+   "strong": 37.5,
+   "weak": 45.83333333333333
+  },
+  {
+   "name": "Wexford Maryvale",
+   "centres": 2,
+   "base": 55,
+   "unweighted": 50,
+   "strong": 38.18181818181819,
+   "weak": 56.36363636363636
+  },
+  {
+   "name": "Willowdale West",
+   "centres": 2,
+   "base": 50,
+   "unweighted": 50,
+   "strong": 44.0,
+   "weak": 48.0
+  },
+  {
+   "name": "Willowridge-Martingrove-Richview",
+   "centres": 3,
+   "base": 55,
+   "unweighted": 55,
+   "strong": 49.09090909090909,
+   "weak": 41.81818181818181
+  },
+  {
+   "name": "Woburn North",
+   "centres": 4,
+   "base": 37,
+   "unweighted": 37,
+   "strong": 37.83783783783784,
+   "weak": 62.16216216216216
+  },
+  {
+   "name": "Woodbine Corridor",
+   "centres": 1,
+   "base": 55,
+   "unweighted": 57,
+   "strong": 60.0,
+   "weak": 32.72727272727273
+  },
+  {
+   "name": "Woodbine-Lumsden",
+   "centres": 5,
+   "base": 62,
+   "unweighted": 65,
+   "strong": 56.451612903225815,
+   "weak": 41.935483870967744
+  },
+  {
+   "name": "Wychwood",
+   "centres": 1,
+   "base": 48,
+   "unweighted": 49,
+   "strong": 54.166666666666664,
+   "weak": 43.75
+  },
+  {
+   "name": "Yonge-Bay Corridor",
+   "centres": 0,
+   "base": 39,
+   "unweighted": 36,
+   "strong": 30.76923076923077,
+   "weak": 61.53846153846154
+  },
+  {
+   "name": "Yonge-Doris",
+   "centres": 0,
+   "base": 51,
+   "unweighted": 48,
+   "strong": 41.17647058823529,
+   "weak": 50.98039215686274
+  },
+  {
+   "name": "Yonge-Eglinton",
+   "centres": 2,
+   "base": 47,
+   "unweighted": 48,
+   "strong": 38.297872340425535,
+   "weak": 55.319148936170215
+  },
+  {
+   "name": "Yonge-St.Clair",
+   "centres": 0,
+   "base": 51,
+   "unweighted": 52,
+   "strong": 58.82352941176471,
+   "weak": 37.254901960784316
+  },
+  {
+   "name": "York University Heights",
+   "centres": 3,
+   "base": 53,
+   "unweighted": 47,
+   "strong": 64.15094339622641,
+   "weak": 33.9622641509434
+  },
+  {
+   "name": "Yorkdale-Glen Park",
+   "centres": 2,
+   "base": 36,
+   "unweighted": 34,
+   "strong": 52.77777777777778,
+   "weak": 36.11111111111111
+  }
+ ]
+}

@@ -1,0 +1,267 @@
+{
+  "source": "22-083858-01-06_City of Toronto Public Survey_Table2_Weighted.xlsx",
+  "ageGroups": [
+    {
+      "id": "all",
+      "label": "All ages"
+    },
+    {
+      "id": "18-24",
+      "label": "18\u201324"
+    },
+    {
+      "id": "25-34",
+      "label": "25\u201334"
+    },
+    {
+      "id": "35-44",
+      "label": "35\u201344"
+    },
+    {
+      "id": "45-54",
+      "label": "45\u201354"
+    },
+    {
+      "id": "55+",
+      "label": "55+"
+    }
+  ],
+  "questions": [
+    {
+      "id": "mental_health",
+      "title": "Mental health",
+      "question": "Q1. In general, how is your mental health? Would you say:",
+      "base": {
+        "all": 7222,
+        "18-24": 647,
+        "25-34": 1620,
+        "35-44": 1235,
+        "45-54": 1140,
+        "55+": 2581
+      },
+      "unweightedBase": {
+        "all": 7222,
+        "18-24": 474,
+        "25-34": 1186,
+        "35-44": 1385,
+        "45-54": 1279,
+        "55+": 2898
+      },
+      "noAnswer": {
+        "all": 71,
+        "18-24": 8,
+        "25-34": 21,
+        "35-44": 12,
+        "45-54": 11,
+        "55+": 18
+      },
+      "answers": [
+        {
+          "label": "Excellent",
+          "counts": {
+            "all": 1726,
+            "18-24": 96,
+            "25-34": 250,
+            "35-44": 212,
+            "45-54": 254,
+            "55+": 915
+          }
+        },
+        {
+          "label": "Very good",
+          "counts": {
+            "all": 2045,
+            "18-24": 146,
+            "25-34": 372,
+            "35-44": 373,
+            "45-54": 328,
+            "55+": 825
+          }
+        },
+        {
+          "label": "Good",
+          "counts": {
+            "all": 1883,
+            "18-24": 188,
+            "25-34": 470,
+            "35-44": 388,
+            "45-54": 322,
+            "55+": 515
+          }
+        },
+        {
+          "label": "Fair",
+          "counts": {
+            "all": 1086,
+            "18-24": 132,
+            "25-34": 368,
+            "35-44": 185,
+            "45-54": 163,
+            "55+": 238
+          }
+        },
+        {
+          "label": "Poor",
+          "counts": {
+            "all": 411,
+            "18-24": 78,
+            "25-34": 139,
+            "35-44": 65,
+            "45-54": 61,
+            "55+": 69
+          }
+        }
+      ]
+    },
+    {
+      "id": "belonging",
+      "title": "Sense of belonging",
+      "question": "Q3. How would you describe your sense of belonging to your local community? Would you say it is...",
+      "base": {
+        "all": 7222,
+        "18-24": 647,
+        "25-34": 1620,
+        "35-44": 1235,
+        "45-54": 1140,
+        "55+": 2581
+      },
+      "unweightedBase": {
+        "all": 7222,
+        "18-24": 474,
+        "25-34": 1186,
+        "35-44": 1385,
+        "45-54": 1279,
+        "55+": 2898
+      },
+      "noAnswer": {
+        "all": 483,
+        "18-24": 39,
+        "25-34": 90,
+        "35-44": 82,
+        "45-54": 74,
+        "55+": 199
+      },
+      "answers": [
+        {
+          "label": "Very strong",
+          "counts": {
+            "all": 841,
+            "18-24": 49,
+            "25-34": 157,
+            "35-44": 101,
+            "45-54": 136,
+            "55+": 398
+          }
+        },
+        {
+          "label": "Somewhat strong",
+          "counts": {
+            "all": 2797,
+            "18-24": 275,
+            "25-34": 510,
+            "35-44": 464,
+            "45-54": 449,
+            "55+": 1099
+          }
+        },
+        {
+          "label": "Somewhat weak",
+          "counts": {
+            "all": 2064,
+            "18-24": 172,
+            "25-34": 577,
+            "35-44": 400,
+            "45-54": 310,
+            "55+": 605
+          }
+        },
+        {
+          "label": "Very weak",
+          "counts": {
+            "all": 1037,
+            "18-24": 113,
+            "25-34": 285,
+            "35-44": 189,
+            "45-54": 170,
+            "55+": 279
+          }
+        }
+      ]
+    },
+    {
+      "id": "services",
+      "title": "Use of community services",
+      "question": "Q2. How frequently have you used a community-based service or program in your neighbourhood in the past 12 months? This can include a community centre, community health clinic, youth centre, jobs program, shelter, recreation program, etc.",
+      "base": {
+        "all": 7222,
+        "18-24": 647,
+        "25-34": 1620,
+        "35-44": 1235,
+        "45-54": 1140,
+        "55+": 2581
+      },
+      "unweightedBase": {
+        "all": 7222,
+        "18-24": 474,
+        "25-34": 1186,
+        "35-44": 1385,
+        "45-54": 1279,
+        "55+": 2898
+      },
+      "noAnswer": {
+        "all": 230,
+        "18-24": 42,
+        "25-34": 52,
+        "35-44": 35,
+        "45-54": 36,
+        "55+": 65
+      },
+      "answers": [
+        {
+          "label": "Never",
+          "counts": {
+            "all": 3478,
+            "18-24": 217,
+            "25-34": 673,
+            "35-44": 500,
+            "45-54": 537,
+            "55+": 1551
+          }
+        },
+        {
+          "label": "Occasionally (1\u20136)",
+          "counts": {
+            "all": 2242,
+            "18-24": 255,
+            "25-34": 609,
+            "35-44": 439,
+            "45-54": 360,
+            "55+": 580
+          }
+        },
+        {
+          "label": "Frequently (7\u201312)",
+          "counts": {
+            "all": 667,
+            "18-24": 95,
+            "25-34": 183,
+            "35-44": 126,
+            "45-54": 106,
+            "55+": 157
+          }
+        },
+        {
+          "label": "Very frequently (13+)",
+          "counts": {
+            "all": 605,
+            "18-24": 38,
+            "25-34": 104,
+            "35-44": 134,
+            "45-54": 102,
+            "55+": 227
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "source": "22-083858-01-06_City of Toronto Public Survey_Table1_Weighted.xlsx",
+  "question": "Q1. In general, how is your mental health? Would you say:",
+  "groups": [
+    {
+      "id": "strong",
+      "label": "Strong sense of belonging"
+    },
+    {
+      "id": "weak",
+      "label": "Weak sense of belonging"
+    },
+    {
+      "id": "all",
+      "label": "All Torontonians"
+    }
+  ],
+  "base": {
+    "all": 7222,
+    "strong": 3638,
+    "weak": 3101
+  },
+  "unweightedBase": {
+    "all": 7222,
+    "strong": 3695,
+    "weak": 3035
+  },
+  "answers": [
+    {
+      "label": "Excellent",
+      "counts": {
+        "all": 1726,
+        "strong": 1165,
+        "weak": 458
+      }
+    },
+    {
+      "label": "Very good",
+      "counts": {
+        "all": 2045,
+        "strong": 1232,
+        "weak": 711
+      }
+    },
+    {
+      "label": "Good",
+      "counts": {
+        "all": 1883,
+        "strong": 847,
+        "weak": 907
+      }
+    },
+    {
+      "label": "Fair",
+      "counts": {
+        "all": 1086,
+        "strong": 300,
+        "weak": 679
+      }
+    },
+    {
+      "label": "Poor",
+      "counts": {
+        "all": 411,
+        "strong": 75,
+        "weak": 318
+      }
+    }
+  ],
+  "nets": [
+    {
+      "label": "Excellent or very good",
+      "counts": {
+        "all": 3771,
+        "strong": 2397,
+        "weak": 1169
+      }
+    },
+    {
+      "label": "Fair or poor",
+      "counts": {
+        "all": 1497,
+        "strong": 375,
+        "weak": 998
+      }
+    }
+  ]
+}
