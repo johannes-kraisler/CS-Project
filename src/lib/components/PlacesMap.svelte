@@ -1,6 +1,8 @@
 <script>
 	import { onMount } from 'svelte';
 	import { geoMercator, geoPath, json, select, zoom as d3zoom, zoomIdentity } from 'd3';
+	import { inview } from '#lib/inview.js';
+	import { reducedMotion } from '#lib/motion.js';
 
 	/**
 	 * Zoomable map of students' favourite places (x / y columns of survey_0.csv, which belong to
@@ -8,10 +10,14 @@
 	 * Zoom: buttons, drag to pan, Ctrl/Cmd + scroll or pinch (plain scrolling keeps scrolling the page).
 	 * @type {{
 	 *   rows: import('#lib/survey0.js').Response[],
-	 *   total: number
+	 *   total: number,
+	 *   autoCampus?: boolean
 	 * }}
 	 */
-	let { rows, total } = $props();
+	// autoCampus: when the map first comes into view, start on the whole city and fly in to campus.
+	let { rows, total, autoCampus = false } = $props();
+	let seen = $state(false);
+	let flown = false;
 
 	const W = 760;
 	const H = 500;
@@ -70,12 +76,12 @@
 	/** @param {number} factor */
 	const zoomBy = (factor) => select(svgEl).transition().duration(350).call(zoomBehaviour.scaleBy, factor);
 	const reset = () => select(svgEl).transition().duration(450).call(zoomBehaviour.transform, zoomIdentity);
-	const toCampus = () => {
+	const toCampus = (duration = 650) => {
 		const [cx, cy] = campusXY;
 		const s = 14;
 		select(svgEl)
 			.transition()
-			.duration(650)
+			.duration(reducedMotion() ? 0 : duration)
 			.call(zoomBehaviour.transform, zoomIdentity.translate(W / 2 - s * cx, H / 2 - s * cy).scale(s));
 	};
 
@@ -101,6 +107,14 @@
 		select(svgEl).call(zoomBehaviour).on('dblclick.zoom', null);
 		return () => select(svgEl).on('.zoom', null);
 	});
+
+	// Scroll-triggered fly-in: city overview first, then a slow zoom to campus once the outline has loaded.
+	$effect(() => {
+		if (!autoCampus || flown || !seen || !geo) return;
+		flown = true;
+		const t = setTimeout(() => toCampus(2200), reducedMotion() ? 0 : 1100);
+		return () => clearTimeout(t);
+	});
 </script>
 
 <figure class="chart">
@@ -113,13 +127,13 @@
 		<div class="zoom-buttons" role="group" aria-label="Map zoom">
 			<button type="button" onclick={() => zoomBy(1.8)} aria-label="Zoom in">+</button>
 			<button type="button" onclick={() => zoomBy(1 / 1.8)} aria-label="Zoom out">−</button>
-			<button type="button" onclick={toCampus}>Zoom to campus</button>
+			<button type="button" onclick={() => toCampus()}>Zoom to campus</button>
 			<button type="button" onclick={reset}>Reset</button>
 		</div>
 		<p class="hint">Drag to pan · Ctrl/⌘ + scroll or pinch to zoom · click a dot</p>
 	</div>
 
-	<div class="map">
+	<div class="map" use:inview={() => (seen = true)}>
 		<svg bind:this={svgEl} viewBox="0 0 {W} {H}" role="img" aria-label="Map of {points.length} students' favourite places in and around Toronto">
 			<g class="world">
 				{#if geo}
@@ -175,7 +189,7 @@
 	<div class="below">
 		<ul class="legend">
 			{#each GROUPS as g (g.id)}
-				<li><span class="swatch hand-bar" style:--c={g.color}></span>{g.label}</li>
+				<li><span class="swatch" style:background={g.color}></span>{g.label}</li>
 			{/each}
 		</ul>
 		<p class="count">{points.length} of {total} students' places shown{points.length !== total ? ' (filtered)' : ''}</p>
@@ -203,8 +217,8 @@
 		gap: 0.6rem;
 		padding: 1.1rem 1.25rem 1rem;
 		background: var(--surface);
-		border: 2px solid color-mix(in srgb, var(--fg) 60%, transparent);
-		border-radius: var(--wobble);
+		border: 1px solid var(--line);
+		border-radius: 10px;
 		min-width: 0;
 	}
 	h2 {
@@ -232,7 +246,7 @@
 		min-width: 2.1rem;
 		padding: 0.3rem 0.65rem;
 		border: 1px solid var(--line);
-		border-radius: var(--wobble-sm);
+		border-radius: 6px;
 		background: var(--surface);
 		color: var(--fg);
 		font: inherit;
@@ -253,10 +267,11 @@
 	}
 	.map {
 		position: relative;
-		border: 1.5px solid color-mix(in srgb, var(--fg) 40%, transparent);
-		border-radius: var(--wobble);
+		border: 1px solid var(--line);
+		border-radius: 8px;
 		overflow: hidden;
-		background: var(--bg);
+		/* Close to the neighbourhood fill, so slivers between the simplified outlines don't show as dark wedges */
+		background: color-mix(in srgb, var(--track) 70%, var(--bg));
 	}
 	svg {
 		display: block;
@@ -271,9 +286,8 @@
 	}
 	.hood {
 		fill: var(--track);
-		stroke: color-mix(in srgb, var(--fg) 30%, transparent);
+		stroke: var(--line);
 		stroke-width: 1;
-		stroke-dasharray: 5 1.5 9 2;
 		vector-effect: non-scaling-stroke;
 	}
 	.hood-label {
@@ -295,9 +309,8 @@
 		pointer-events: none;
 	}
 	.dot {
-		stroke: var(--fg);
+		stroke: var(--ink);
 		stroke-width: 1.5;
-		filter: url(#sketch);
 		cursor: pointer;
 	}
 	.dot.sel {
@@ -311,7 +324,8 @@
 	}
 	.dot-label {
 		fill: var(--fg);
-		font-size: 14px;
+		font-size: 12px;
+		font-weight: 600;
 		paint-order: stroke;
 		stroke: var(--surface);
 		stroke-width: 3px;
@@ -341,7 +355,7 @@
 	.swatch {
 		width: 0.7rem;
 		height: 0.7rem;
-		border-radius: 50% 45% 55% 48%;
+		border-radius: 50%;
 	}
 	.count {
 		margin: 0;
@@ -353,7 +367,7 @@
 		min-height: 3.2rem;
 		padding: 0.6rem 0.8rem;
 		background: var(--track);
-		border-radius: var(--wobble);
+		border-radius: 6px;
 		font-size: 0.85rem;
 		line-height: 1.45;
 	}

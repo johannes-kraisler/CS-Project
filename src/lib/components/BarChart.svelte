@@ -1,4 +1,5 @@
 <script>
+	import { inview } from '#lib/inview.js';
 	/**
 	 * Horizontal bar chart for one survey question.
 	 * @type {{
@@ -34,20 +35,21 @@
 
 	let noAnswer = $derived(pct(question.noAnswer[age], age));
 	let comparing = $derived(age !== 'all');
+	let ready = $state(false); // bars grow in from 0 the first time the chart is seen
 </script>
 
-<figure class="chart">
+<figure class="chart" use:inview={() => (ready = true)}>
 	<figcaption>
 		<h2>{question.title}</h2>
 		<p class="q">{question.question.replace(/^Q\d+\.\s*/, '')}</p>
 	</figcaption>
 
 	<ul class="bars" aria-label="{question.title}, {ageLabel}">
-		{#each rows as row (row.label)}
-			<li>
+		{#each rows as row, i (row.label)}
+			<li style:--i={i}>
 				<span class="label">{row.label}</span>
 				<span class="track">
-					<span class="bar hand-bar" style:width="{(row.value / max) * 100}%" style:--c={row.color}></span>
+					<span class="bar" style:width="{ready ? (row.value / max) * 100 : 0}%" style:background-color={row.color}></span>
 					{#if comparing}
 						<span
 							class="marker"
@@ -92,8 +94,8 @@
 		gap: 1rem;
 		padding: 1.25rem 1.25rem 1rem;
 		background: var(--surface);
-		border: 2px solid color-mix(in srgb, var(--fg) 60%, transparent);
-		border-radius: var(--wobble);
+		border: 1px solid var(--line);
+		border-radius: 10px;
 		min-width: 0;
 	}
 	h2 {
@@ -126,12 +128,14 @@
 	.track {
 		position: relative;
 		height: 1.4rem;
-		border-bottom: 1.5px dashed color-mix(in srgb, var(--fg) 25%, transparent);
+		background: var(--track);
+		border-radius: 4px;
 	}
 	.bar {
 		position: absolute;
 		inset: 0 auto 0 0;
-		transition: width 350ms ease;
+		border-radius: 4px;
+		transition: width 900ms var(--ease-out) calc(var(--i) * 70ms);
 	}
 	.marker {
 		position: absolute;
@@ -140,18 +144,17 @@
 		width: 2px;
 		margin-left: -1px;
 		background: var(--fg);
-		filter: url(#sketch);
-		transition: left 350ms ease;
+		transition: left 900ms var(--ease-out);
 	}
 	.value {
 		text-align: right;
 		font-variant-numeric: tabular-nums;
-		font-size: 1.1rem;
+		font-weight: 600;
 	}
 	.caption {
 		padding: 0.75rem 0.9rem;
 		background: var(--track);
-		border-radius: var(--wobble);
+		border-radius: 6px;
 		font-size: 0.85rem;
 		line-height: 1.45;
 	}

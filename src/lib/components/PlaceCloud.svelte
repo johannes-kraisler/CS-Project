@@ -1,5 +1,6 @@
 <script>
 	import { hierarchy, pack } from 'd3';
+	import { inview } from '#lib/inview.js';
 
 	/**
 	 * Bubble "word cloud" of favourite-place categories (column "What type of place is this? (1)").
@@ -12,22 +13,25 @@
 	 * }}
 	 */
 	let { rows, total, column } = $props();
+	let popped = $state(false); // bubbles pop in, largest first, the first time the cloud is seen
 
 	const W = 640;
 	const H = 460;
 
 	/** Display names and colours for each category. */
 	const STYLE = {
-		'Campus space (lounge, study space)': { name: 'Campus space', color: 'var(--seq-3)' },
-		'Gym or recreation centre': { name: 'Gym or rec centre', color: 'var(--good-2)' },
-		'Park or outdoor space': { name: 'Park or outdoors', color: 'var(--good-1)' },
-		'Club, cultural or community group': { name: 'Club or community group', color: 'var(--bad-1)' },
-		Library: { name: 'Library', color: 'var(--seq-2)' },
-		'Religious or spiritual space': { name: 'Religious space', color: 'var(--mid)' },
-		'Café or restaurant': { name: 'Café or restaurant', color: 'var(--bad-2)' },
-		'Pub or bar': { name: 'Pub or bar', color: 'var(--bad-2)' },
-		"Home or friend's home": { name: "Home or friend's home", color: 'var(--seq-4)' },
-		'Online gaming': { name: 'Online gaming', color: 'var(--seq-1)' },
+		// Okabe-Ito colours. There are more categories than colours, so a few share one;
+		// every bubble is labelled, so colour is never the only cue.
+		'Campus space (lounge, study space)': { name: 'Campus space', color: 'var(--oi-blue)' },
+		'Gym or recreation centre': { name: 'Gym or rec centre', color: 'var(--oi-green)' },
+		'Park or outdoor space': { name: 'Park or outdoors', color: 'var(--oi-sky)' },
+		'Club, cultural or community group': { name: 'Club or community group', color: 'var(--oi-orange)' },
+		Library: { name: 'Library', color: 'var(--oi-purple)' },
+		'Religious or spiritual space': { name: 'Religious space', color: 'var(--oi-yellow)' },
+		'Café or restaurant': { name: 'Café or restaurant', color: 'var(--oi-vermillion)' },
+		'Pub or bar': { name: 'Pub or bar', color: 'var(--oi-vermillion)' },
+		"Home or friend's home": { name: "Home or friend's home", color: 'var(--oi-black)' },
+		'Online gaming': { name: 'Online gaming', color: 'var(--oi-purple)' },
 		Other: { name: 'Other', color: 'var(--muted)' }
 	};
 	const styleOf = (/** @type {string} */ c) =>
@@ -82,7 +86,7 @@
 	let counted = $derived(categories.reduce((s, c) => s + c.count, 0));
 </script>
 
-<figure class="chart">
+<figure class="chart" class:popped use:inview={() => (popped = true)}>
 	<figcaption>
 		<h2>Where students like to socialize</h2>
 		<p class="col">Column: “{column}”. Bubble size = number of students who named that type of place.</p>
@@ -90,11 +94,12 @@
 
 	<div class="cloud">
 		<svg viewBox="0 0 {W} {H}" role="img" aria-label="Bubble chart of favourite place types: {bubbles.map((b) => `${b.name} ${b.count}`).join(', ')}">
-			{#each bubbles as b (b.category)}
+			{#each bubbles as b, bi (b.category)}
 				{@const longest = Math.max(...lines(b.name).map((l) => l.length))}
 				<!-- Font size: grows with the bubble, but never wider than ~80% of its diameter (≈0.58em per character). -->
 				{@const fs = Math.max(8, Math.min(22, b.r / 3.6, (b.r * 1.6) / (longest * 0.58)))}
 				<g
+					style:--i={bi}
 					class="bubble"
 					class:sel={b.category === selected}
 					transform="translate({b.x},{b.y})"
@@ -110,7 +115,6 @@
 					}}
 				>
 					<circle r={b.r} style:--c={b.color} />
-					<circle class="pen2" r={b.r} style:--c={b.color} />
 					{#each lines(b.name) as line, li (li)}
 						<text
 							class="word"
@@ -148,8 +152,8 @@
 		gap: 0.6rem;
 		padding: 1.1rem 1.25rem 1rem;
 		background: var(--surface);
-		border: 2px solid color-mix(in srgb, var(--fg) 60%, transparent);
-		border-radius: var(--wobble);
+		border: 1px solid var(--line);
+		border-radius: 10px;
 		min-width: 0;
 	}
 	h2 {
@@ -173,23 +177,29 @@
 		cursor: pointer;
 		outline: none;
 	}
+	/* Entrance: each bubble scales up from its centre, one after another */
+	.bubble > * {
+		transform: scale(0);
+		transform-origin: 0 0;
+		opacity: 0;
+		transition:
+			transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 70ms),
+			opacity 300ms ease calc(var(--i) * 70ms),
+			fill 200ms ease;
+	}
+	.popped .bubble > * {
+		transform: none;
+		opacity: 1;
+	}
 	.bubble circle {
-		fill: color-mix(in srgb, var(--c) 22%, var(--surface));
-		stroke: var(--c);
-		stroke-width: 2.2;
+		fill: color-mix(in srgb, var(--c) 30%, var(--surface));
+		stroke: var(--ink);
+		stroke-width: 2;
 		filter: url(#sketch);
 		transition: fill 200ms ease;
 	}
-	/* Second, offset pen stroke for a sketched double line. */
-	.bubble circle.pen2 {
-		fill: none;
-		stroke-width: 1.2;
-		stroke-opacity: 0.6;
-		filter: url(#sketch-alt);
-		pointer-events: none;
-	}
-	.bubble:hover circle:not(.pen2),
-	.bubble.sel circle:not(.pen2) {
+	.bubble:hover circle,
+	.bubble.sel circle {
 		fill: color-mix(in srgb, var(--c) 40%, var(--surface));
 	}
 	.bubble.sel circle,
@@ -199,7 +209,8 @@
 	}
 	.word {
 		fill: var(--fg);
-		font-family: var(--font-hand);
+		font-family: var(--font-display);
+		font-weight: 600;
 		pointer-events: none;
 	}
 	.n {
@@ -216,7 +227,7 @@
 		min-height: 2.6rem;
 		padding: 0.6rem 0.8rem;
 		background: var(--track);
-		border-radius: var(--wobble);
+		border-radius: 6px;
 		font-size: 0.85rem;
 		line-height: 1.45;
 	}

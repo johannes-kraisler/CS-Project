@@ -48,7 +48,7 @@
 
 	<ul class="legend" aria-hidden="true">
 		{#each measures as m (m.key)}
-			<li><span class="swatch hand-bar" style:--c={m.color}></span>{m.label}</li>
+			<li><span class="swatch" style:background={m.color}></span>{m.label}</li>
 		{/each}
 	</ul>
 
@@ -64,7 +64,7 @@
 						{@const v = m.key === 'strong' ? g.strong : g.weak}
 						<div class="line">
 							<span class="track">
-								<span class="bar hand-bar" style:width="{(v / max) * 100}%" style:--c={m.color}></span>
+								<span class="bar" style:width="{(v / max) * 100}%" style:background-color={m.color}></span>
 							</span>
 							<span class="value" style:color={m.color}>{v.toFixed(0)}%</span>
 						</div>
@@ -101,8 +101,8 @@
 		gap: 1rem;
 		padding: 1.25rem 1.25rem 1rem;
 		background: var(--surface);
-		border: 2px solid color-mix(in srgb, var(--fg) 60%, transparent);
-		border-radius: var(--wobble);
+		border: 1px solid var(--line);
+		border-radius: 10px;
 		min-width: 0;
 	}
 	h2 {
@@ -135,6 +135,7 @@
 	.swatch {
 		width: 0.8rem;
 		height: 0.8rem;
+		border-radius: 3px;
 	}
 	.rows {
 		display: grid;
@@ -170,21 +171,23 @@
 	.track {
 		position: relative;
 		height: 1.1rem;
-		border-bottom: 1.5px dashed color-mix(in srgb, var(--fg) 25%, transparent);
+		background: var(--track);
+		border-radius: 4px;
 	}
 	.bar {
 		position: absolute;
 		inset: 0 auto 0 0;
+		border-radius: 4px;
 	}
 	.value {
 		text-align: right;
-		font-size: 1.1rem;
+		font-weight: 600;
 		font-variant-numeric: tabular-nums;
 	}
 	.caption {
 		padding: 0.75rem 0.9rem;
 		background: var(--track);
-		border-radius: var(--wobble);
+		border-radius: 6px;
 		font-size: 0.85rem;
 		line-height: 1.45;
 	}

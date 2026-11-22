@@ -1,4 +1,5 @@
 <script>
+	import { inview } from '#lib/inview.js';
 	/**
 	 * Two lines across the categories of one question: % with a strong and % with a weak sense
 	 * of belonging in each category. The viewer picks a category (buttons or clicking the chart)
@@ -95,9 +96,10 @@
 		return { kind: 'ratio', big: `${r}× more`, small: `feel ${more} than ${less}`, weakMore, more, less, hi, ratio };
 	};
 	let cmp = $derived(comparison(sel));
+	let drawn = $state(false); // lines draw themselves the first time the chart is seen
 </script>
 
-<figure class="chart" class:compact>
+<figure class="chart" class:compact class:drawn use:inview={() => (drawn = true)}>
 	<figcaption>
 		<h2>{title}</h2>
 		<p class="q">{intro}</p>
@@ -144,14 +146,13 @@
 
 			{#each lines as l (l.key)}
 				{@const other = l.key === 'strong' ? lines[1].values : lines[0].values}
-				<path class="pen" d={pathOf(l.values)} fill="none" stroke={l.color} stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" />
-				<!-- Second, thinner pen stroke with different jitter: a sketched double line -->
-				<path class="pen2" d={pathOf(l.values)} fill="none" stroke={l.color} stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" />
+				<path class="line" pathLength="1" d={pathOf(l.values)} fill="none" stroke={l.color} stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" />
 				{#each l.values as v, i (i)}
-					<circle class="pen" cx={cx(i)} cy={y(v)} r="7" style:fill="color-mix(in srgb, {l.color} 30%, var(--surface))" stroke={l.color} stroke-width="2.5" />
+					<circle class="pt" style:--d="{300 + (i / Math.max(1, last)) * 1100}ms" cx={cx(i)} cy={y(v)} r="6.5" fill={l.color} stroke="var(--surface)" stroke-width="2.5" />
 					{#if !(l.key === 'weak' && Math.abs(v - other[i]) < 0.5)}
 						<!-- When both lines share a value, only one label is drawn (in the muted colour). -->
 						<text
+							style:--d="{400 + (i / Math.max(1, last)) * 1100}ms"
 							class="val"
 							x={cx(i)}
 							y={labelAbove(v, other[i]) ? y(v) - 14 : y(v) + 26}
@@ -163,7 +164,7 @@
 					{/if}
 				{/each}
 				<!-- Direct label at the end of the line -->
-				<text class="end" x={cx(last) + 22} y={y(l.values[last])} dominant-baseline="middle" fill={l.color}>{l.label}</text>
+				<text class="end" style:--d="1500ms" x={cx(last) + 22} y={y(l.values[last])} dominant-baseline="middle" fill={l.color}>{l.label}</text>
 			{/each}
 
 			<!-- Click a rating on the chart to select it (the buttons above are the keyboard-accessible control) -->
@@ -184,7 +185,7 @@
 				{@const v = l.values[selIndex]}
 				<div class="sbar">
 					<span class="sbar-label">{l.label}</span>
-					<span class="sbar-track"><span class="sbar-fill hand-bar" style:width="{v}%" style:--c={l.color}></span></span>
+					<span class="sbar-track"><span class="sbar-fill" style:width="{v}%" style:background-color={l.color}></span></span>
 					<span class="sbar-val" style:color={l.color}>{v.toFixed(0)}%</span>
 				</div>
 			{/each}
@@ -228,8 +229,8 @@
 		gap: 1rem;
 		padding: 1.25rem 1.25rem 1rem;
 		background: var(--surface);
-		border: 2px solid color-mix(in srgb, var(--fg) 60%, transparent);
-		border-radius: var(--wobble);
+		border: 1px solid var(--line);
+		border-radius: 10px;
 		min-width: 0;
 	}
 	h2 {
@@ -256,6 +257,26 @@
 		height: auto;
 		overflow: visible;
 	}
+	/* Entrance: lines draw left to right, then points and labels appear along them */
+	.line {
+		stroke-dasharray: 1;
+		stroke-dashoffset: 1;
+		transition: stroke-dashoffset 1400ms var(--ease-out) 150ms;
+	}
+	.drawn .line {
+		stroke-dashoffset: 0;
+	}
+	.pt,
+	.val,
+	.end {
+		opacity: 0;
+		transition: opacity 400ms ease var(--d, 0ms);
+	}
+	.drawn .pt,
+	.drawn .val,
+	.drawn .end {
+		opacity: 1;
+	}
 	.band-g {
 		--band: var(--bad-2);
 		transition: transform 300ms ease;
@@ -267,10 +288,8 @@
 		fill: var(--band);
 		fill-opacity: 0.08;
 		stroke: var(--band);
-		stroke-opacity: 0.6;
-		stroke-width: 2;
-		stroke-dasharray: 10 4 3 4;
-		filter: url(#sketch);
+		stroke-opacity: 0.45;
+		stroke-width: 1.5;
 	}
 	.hit {
 		fill: transparent;
@@ -278,45 +297,38 @@
 	}
 	.band-title {
 		fill: var(--band);
-		font-size: 20px;
+		font-size: 17px;
 		font-weight: 700;
 		font-variant-numeric: tabular-nums;
 	}
 	.band-sub {
 		fill: var(--muted);
-		font-size: 13px;
-	}
-	.pen {
-		filter: url(#sketch);
-	}
-	.pen2 {
-		filter: url(#sketch-alt);
-		opacity: 0.55;
+		font-size: 11px;
 	}
 	.grid {
-		stroke: color-mix(in srgb, var(--fg) 22%, transparent);
-		stroke-width: 1.2;
-		stroke-dasharray: 14 3 6 3;
-		filter: url(#sketch);
+		stroke: var(--line);
+		stroke-width: 1;
 	}
 	.tick {
 		fill: var(--muted);
-		font-size: 14px;
+		font-size: 12px;
 		font-variant-numeric: tabular-nums;
 	}
 	.xl {
 		fill: var(--fg);
-		font-size: 16px;
+		font-size: 14px;
 	}
 	.xl.hl {
 		font-weight: 600;
 	}
 	.val {
-		font-size: 17px;
+		font-size: 14px;
+		font-weight: 600;
 		font-variant-numeric: tabular-nums;
 	}
 	.end {
-		font-size: 16px;
+		font-size: 13px;
+		font-weight: 600;
 	}
 	.picker {
 		border: 0;
@@ -338,7 +350,7 @@
 	.options label {
 		padding: 0.4rem 0.85rem;
 		border: 1px solid var(--line);
-		border-radius: var(--wobble);
+		border-radius: 999px;
 		background: var(--surface);
 		cursor: pointer;
 		font-size: 0.85rem;
@@ -368,7 +380,7 @@
 		padding: 0.9rem 1rem;
 		border: 1px solid color-mix(in srgb, var(--band) 45%, transparent);
 		background: color-mix(in srgb, var(--band) 7%, transparent);
-		border-radius: var(--wobble);
+		border-radius: 8px;
 		max-width: 54rem;
 	}
 	.summary.strong {
@@ -400,11 +412,14 @@
 	}
 	.sbar-track {
 		height: 0.9rem;
-		border-bottom: 1.5px dashed color-mix(in srgb, var(--fg) 25%, transparent);
+		background: var(--track);
+		border-radius: 4px;
+		overflow: hidden;
 	}
 	.sbar-fill {
 		display: block;
 		height: 100%;
+		border-radius: 4px;
 		transition: width 300ms ease;
 	}
 	.sbar-val {
@@ -434,7 +449,7 @@
 	.caption {
 		padding: 0.75rem 0.9rem;
 		background: var(--track);
-		border-radius: var(--wobble);
+		border-radius: 6px;
 		font-size: 0.85rem;
 		line-height: 1.45;
 	}

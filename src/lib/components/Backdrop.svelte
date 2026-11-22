@@ -1,9 +1,13 @@
 <script>
 	/**
-	 * Faint hand-drawn city scene fixed behind the whole page: a skyline with the CN Tower,
-	 * a café, a park bench and groups of friends laughing. Decorative only (aria-hidden).
+	 * Faint hand-drawn Toronto scene: a skyline with the CN Tower, a café, a park bench and
+	 * groups of friends laughing. Decorative only (aria-hidden).
+	 * Fills its nearest positioned parent (give that parent `position: relative`), anchored to
+	 * the bottom. `sky={false}` drops the sun, clouds and birds (e.g. where other doodles sit).
 	 * Uses the shared #sketch filter from +layout.svelte for the pen wobble.
+	 * @type {{ sky?: boolean }}
 	 */
+	let { sky = true } = $props();
 
 	/** Standing or sitting person, feet at (0,0), about 150 units tall, laughing. */
 	const people = [
@@ -52,11 +56,13 @@
 <svg class="backdrop" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
 	<g class="ink" filter="url(#sketch)">
 		<!-- Sky: sun, clouds, birds -->
+		{#if sky}
 		<circle cx="1260" cy="150" r="46" />
 		<path d="M1260,82 v-22 M1260,218 v22 M1192,150 h-22 M1328,150 h22 M1212,102 l-15,-15 M1308,198 l15,15 M1308,102 l15,-15 M1212,198 l-15,15" />
 		<path d="M180,180 q10,-34 46,-26 q14,-28 50,-14 q30,-6 34,24 q26,8 12,30 h-148 q-20,-6 6,-14 z" />
 		<path d="M820,120 q8,-26 36,-20 q12,-22 40,-10 q24,-4 26,18 q20,6 10,22 h-118 q-16,-4 6,-10 z" />
 		<path d="M520,230 q8,-8 16,0 q8,-8 16,0 M580,200 q6,-6 12,0 q6,-6 12,0 M1000,260 q8,-8 16,0 q8,-8 16,0" />
+		{/if}
 
 		<!-- Skyline (background, lighter) -->
 		<g class="far">
@@ -127,13 +133,13 @@
 
 <style>
 	.backdrop {
-		position: fixed;
+		position: absolute;
 		inset: 0;
-		width: 100vw;
-		height: 100vh;
+		width: 100%;
+		height: 100%;
 		z-index: 0;
 		pointer-events: none;
-		opacity: var(--backdrop-opacity, 0.11);
+		opacity: var(--backdrop-opacity, 0.14);
 	}
 	.ink {
 		fill: none;
@@ -156,7 +162,7 @@
 	text {
 		fill: var(--fg);
 		stroke: none;
-		font-family: var(--font-hand-title);
+		font-family: var(--font-display);
 		font-weight: 700;
 	}
 	.sign {
@@ -170,7 +176,7 @@
 	}
 	@media (max-width: 700px) {
 		.backdrop {
-			opacity: calc(var(--backdrop-opacity, 0.11) * 0.7);
+			opacity: calc(var(--backdrop-opacity, 0.14) * 0.7);
 		}
 	}
 </style>

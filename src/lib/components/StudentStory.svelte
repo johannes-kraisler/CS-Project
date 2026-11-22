@@ -1,6 +1,8 @@
 <script>
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
+	import { sceneIn, sceneOut } from '#lib/motion.js';
+	import WordReveal from '#lib/components/WordReveal.svelte';
+	import CountUp from '#lib/components/CountUp.svelte';
 	import { csv } from 'd3';
 	import SurveyBars from '#lib/components/SurveyBars.svelte';
 	import BelongingLines from '#lib/components/BelongingLines.svelte';
@@ -180,6 +182,7 @@
 	];
 
 	let active = $state(0);
+	let progress = $state(0); // 0–1 through the active step, drives the word reveal
 	let scene = $derived(steps[active].scene);
 	/** @type {HTMLElement} */
 	let stepsEl;
@@ -192,16 +195,28 @@
 		/** @type {any} */
 		let scroller;
 		const onResize = () => scroller?.resize();
+		// How far (0–1) the reader is through the active step, measured at the same 55% line as scrollama.
+		const onScroll = () => {
+			const el = stepsEl.querySelectorAll('.step')[active];
+			if (!el) return;
+			const r = el.getBoundingClientRect();
+			progress = Math.min(1, Math.max(0, (innerHeight * 0.55 - r.top) / r.height));
+		};
+		addEventListener('scroll', onScroll, { passive: true });
 		import('scrollama').then(({ default: scrollama }) => {
 			scroller = scrollama();
 			scroller
 				.setup({ step: Array.from(stepsEl.querySelectorAll('.step')), offset: 0.55 })
-				.onStepEnter((/** @type {{ index: number }} */ r) => (active = r.index));
+				.onStepEnter((/** @type {{ index: number }} */ r) => {
+					active = r.index;
+					onScroll();
+				});
 			window.addEventListener('resize', onResize);
 		});
 		return () => {
 			scroller?.destroy();
 			window.removeEventListener('resize', onResize);
+			removeEventListener('scroll', onScroll);
 		};
 	});
 </script>
@@ -210,7 +225,7 @@
 	<div class="graphic">
 		<div class="stage">
 			{#key scene}
-				<div class="scene" transition:fade={{ duration: 300 }}>
+				<div class="scene" in:sceneIn out:sceneOut>
 					{#if scene === 'bars'}
 					<div class="toolbar">
 						<p class="count">
@@ -290,13 +305,13 @@
 								<h2>Mental health and belonging go hand in hand</h2>
 								<div class="tiles">
 									<div class="tile">
-										<p class="big"><span class="bad">18%</span> vs <span class="good">67%</span></p>
+										<p class="big"><span class="bad"><CountUp value={18} />%</span> vs <span class="good"><CountUp value={67} />%</span></p>
 										<p class="what">of Torontonians with poor vs excellent mental health feel a strong sense of belonging</p>
 										<p class="src">City survey · 7,222 residents</p>
 									</div>
 									<div class="tile">
 										<p class="big">
-											<span class="bad">{evidence.studentsFair}%</span> vs <span class="good">{evidence.studentsExcellent}%</span>
+											<span class="bad"><CountUp value={evidence.studentsFair} />%</span> vs <span class="good"><CountUp value={evidence.studentsExcellent} />%</span>
 										</p>
 										<p class="what">of students with fair vs excellent mental health feel strongly connected</p>
 										<p class="src">Our survey · {evidence.total} students</p>
@@ -307,13 +322,13 @@
 								<h2>Belonging needs a place to grow</h2>
 								<div class="tiles">
 									<div class="tile">
-										<p class="big"><span class="bad">42%</span> → <span class="good">70%</span></p>
+										<p class="big"><span class="bad"><CountUp value={42} />%</span> → <span class="good"><CountUp value={70} />%</span></p>
 										<p class="what">strong belonging among Torontonians who never vs very frequently use community services</p>
 										<p class="src">City survey · 7,222 residents</p>
 									</div>
 									<div class="tile">
 										<p class="big">
-											<span class="bad">{evidence.studentsRarely}%</span> → <span class="good">{evidence.studentsVeryOften}%</span>
+											<span class="bad"><CountUp value={evidence.studentsRarely} />%</span> → <span class="good"><CountUp value={evidence.studentsVeryOften} />%</span>
 										</p>
 										<p class="what">
 											of students strongly connected when they spend under 3 vs over 8 hours a week at their favourite place
@@ -321,7 +336,7 @@
 										<p class="src">Our survey · {evidence.total} students</p>
 									</div>
 									<div class="tile wide">
-										<p class="big"><span class="bad">{evidence.noPlacePct}%</span></p>
+										<p class="big"><span class="bad"><CountUp value={evidence.noPlacePct} />%</span></p>
 										<p class="what">
 											of students ({evidence.noPlace} of {evidence.total}) have no regular place to socialize outside home,
 											school and work
@@ -332,7 +347,7 @@
 							</section>
 						</div>
 					{:else if scene === 'map'}
-						<PlacesMap rows={subset(null)} total={rows.length} />
+						<PlacesMap rows={subset(null)} total={rows.length} autoCampus />
 					{:else if scene === 'cloud'}
 						<PlaceCloud rows={subset(null)} total={rows.length} column={COLUMNS.placeType} />
 					{/if}
@@ -345,9 +360,14 @@
 		{#each steps as s, i (i)}
 			<div class="step" class:is-active={i === active} data-step={i}>
 				<div class="card" class:main={!!s.message}>
-					<p class="kicker">{s.kicker}</p>
+					<div class="card-top">
+						<p class="kicker mono">{s.kicker}</p>
+						<span class="step-no mono">{String(i + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}</span>
+					</div>
 					{#if s.message}
-						<p class="message">{s.message}</p>
+						<p class="statement">
+							<WordReveal text={s.message} progress={i === active ? progress : i < active ? 1 : 0} />
+						</p>
 					{/if}
 					{#if s.title}
 						<h3>{s.title}</h3>
@@ -357,7 +377,7 @@
 					{/each}
 					{#if s.findings}
 						<div class="findings">
-							<p class="findings-head">Key findings</p>
+							<p class="findings-head mono">Key findings</p>
 							<ul>
 								{#each s.findings as f}
 									<li>{f}</li>
@@ -373,51 +393,17 @@
 </section>
 
 <style>
-	.story {
-		position: relative;
-		display: grid;
-		grid-template-columns: minmax(16rem, 23rem) minmax(0, 1fr);
-		gap: 2rem;
-	}
-	.steps {
-		grid-column: 1;
-		grid-row: 1;
-		position: relative;
-		z-index: 1;
-	}
-	.graphic {
-		grid-column: 2;
-		grid-row: 1;
-		position: sticky;
-		top: 0;
-		height: 100vh;
-		height: 100dvh;
-		display: flex;
-		align-items: center;
-		min-width: 0;
-	}
-	.stage {
-		display: grid;
-		gap: 0.75rem;
-		width: 100%;
-	}
-	.scene {
-		grid-area: 1 / 1;
-		display: grid;
-		gap: 0.75rem;
-		min-width: 0;
-	}
 	.evidence {
 		display: grid;
-		gap: 1.25rem;
+		gap: 1.5rem;
 	}
 	.ev-group {
 		display: grid;
-		gap: 0.6rem;
+		gap: 0.7rem;
 	}
 	.ev-group h2 {
 		margin: 0;
-		font: 600 1.1rem/1.25 var(--font-display);
+		font: 700 clamp(1.8rem, 2.6vw, 2.2rem) / 1.05 var(--font-display);
 	}
 	.tiles {
 		display: grid;
@@ -432,11 +418,34 @@
 	.tile {
 		display: grid;
 		align-content: start;
-		gap: 0.35rem;
-		padding: 1rem 1.1rem;
+		gap: 0.4rem;
+		padding: 1.1rem 1.2rem;
 		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: 10px;
+		border: 2px solid var(--ink);
+		border-radius: var(--wobble);
+		box-shadow: var(--shadow);
+		animation: tile-in 700ms var(--ease-out) backwards;
+	}
+	.tile:nth-child(2) {
+		animation-delay: 120ms;
+	}
+	.tile:nth-child(3) {
+		animation-delay: 240ms;
+	}
+	.ev-group + .ev-group .tile {
+		animation-delay: 300ms;
+	}
+	.ev-group + .ev-group .tile:nth-child(2) {
+		animation-delay: 420ms;
+	}
+	.ev-group + .ev-group .tile:nth-child(3) {
+		animation-delay: 540ms;
+	}
+	@keyframes tile-in {
+		from {
+			opacity: 0;
+			transform: translateY(20px) scale(0.97);
+		}
 	}
 	.tile.wide {
 		grid-column: 1 / -1;
@@ -445,8 +454,7 @@
 		margin: 0;
 	}
 	.big {
-		font: 700 clamp(1.6rem, 3vw, 2.1rem) / 1.1 var(--font-display);
-		font-variant-numeric: tabular-nums;
+		font: 700 clamp(2.6rem, 5vw, 3.6rem) / 0.95 var(--font-display);
 		color: var(--muted);
 	}
 	.big .good {
@@ -456,23 +464,20 @@
 		color: var(--bad-2);
 	}
 	.what {
-		font-size: 0.875rem;
+		font-size: 1rem;
 		line-height: 1.4;
 	}
 	.src {
-		font-size: 0.72rem;
+		font-family: var(--font-mono);
+		font-size: 0.85rem;
 		color: var(--muted);
 	}
 	.para {
 		font-size: 0.92rem;
-		line-height: 1.6;
-	}
-	.message {
-		font: 600 clamp(1.35rem, 2.6vw, 1.75rem) / 1.3 var(--font-display) !important;
-		text-wrap: pretty;
+		line-height: 1.65;
 	}
 	.card.main {
-		border-color: var(--accent);
+		padding-block: 1.8rem;
 	}
 	.note {
 		margin: 0;
@@ -499,20 +504,26 @@
 	.clear {
 		font: inherit;
 		font-size: 0.8rem;
-		padding: 0.3rem 0.7rem;
+		padding: 0.35rem 0.8rem;
 		border-radius: 999px;
 		cursor: pointer;
+		transition:
+			background 200ms ease,
+			border-color 200ms ease;
 	}
 	.chip {
-		border: 1px solid var(--accent);
-		background: var(--accent);
-		color: var(--bg);
-		font-weight: 600;
+		border: 1.5px solid var(--ink);
+		background: var(--highlight);
+		color: var(--ink);
+		font-weight: 700;
 	}
 	.clear {
-		border: 1px solid var(--line);
+		border: 1.5px solid var(--ink);
 		background: var(--surface);
 		color: var(--fg);
+	}
+	.clear:not(:disabled):hover {
+		border-color: var(--accent);
 	}
 	.clear:disabled {
 		opacity: 0.5;
@@ -523,98 +534,7 @@
 		outline: 2px solid var(--accent);
 		outline-offset: 2px;
 	}
-	.pair {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-		gap: 1rem;
-	}
 	.error {
 		color: var(--bad-2);
-	}
-	.step {
-		min-height: 100vh;
-		display: flex;
-		align-items: center;
-	}
-	.tail {
-		height: 20vh;
-	}
-	.card {
-		display: grid;
-		gap: 0.6rem;
-		padding: 1.25rem 1.35rem;
-		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: 10px;
-		opacity: 0.35;
-		transition: opacity 300ms ease;
-		box-shadow: 0 6px 24px rgb(0 0 0 / 0.06);
-	}
-	.is-active .card {
-		opacity: 1;
-	}
-	.card p,
-	h3 {
-		margin: 0;
-	}
-	.kicker {
-		font-size: 0.7rem;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--accent);
-	}
-	h3 {
-		font: 600 1.3rem/1.25 var(--font-display);
-		text-wrap: balance;
-	}
-	.findings {
-		padding: 0.75rem 0.9rem;
-		background: var(--track);
-		border-radius: 6px;
-	}
-	.findings-head {
-		margin: 0 0 0.35rem !important;
-		font-size: 0.7rem;
-		font-weight: 600;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--muted);
-	}
-	.findings ul {
-		margin: 0;
-		padding-left: 1.1rem;
-		display: grid;
-		gap: 0.4rem;
-		font-size: 0.875rem;
-		line-height: 1.45;
-	}
-	@media (max-width: 900px) {
-		.story {
-			display: block;
-		}
-		.graphic {
-			align-items: flex-start;
-			padding-top: 0.5rem;
-			overflow: hidden;
-		}
-		.steps {
-			margin-top: -100vh;
-			margin-top: -100dvh;
-			pointer-events: none;
-		}
-		.card {
-			pointer-events: auto;
-			opacity: 1;
-		}
-		.step {
-			align-items: flex-end;
-			padding-bottom: 8vh;
-		}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.card {
-			transition: none;
-		}
 	}
 </style>

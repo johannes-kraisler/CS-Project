@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
+	import { sceneIn, sceneOut } from '#lib/motion.js';
+	import WordReveal from '#lib/components/WordReveal.svelte';
 	import BarChart from '#lib/components/BarChart.svelte';
 	import BelongingLines from '#lib/components/BelongingLines.svelte';
 
@@ -81,6 +82,7 @@
 	];
 
 	let active = $state(0);
+	let progress = $state(0); // 0–1 through the active step, drives the word reveal
 	let step = $derived(steps[active]);
 	let age = $derived(step.age ?? 'all');
 	let ageLabel = $derived(data.ageGroups.find((/** @type {any} */ g) => g.id === age)?.label ?? 'All ages');
@@ -95,16 +97,28 @@
 		/** @type {any} */
 		let scroller;
 		const onResize = () => scroller?.resize();
+		// How far (0–1) the reader is through the active step, measured at the same 55% line as scrollama.
+		const onScroll = () => {
+			const el = stepsEl.querySelectorAll('.step')[active];
+			if (!el) return;
+			const r = el.getBoundingClientRect();
+			progress = Math.min(1, Math.max(0, (innerHeight * 0.55 - r.top) / r.height));
+		};
+		addEventListener('scroll', onScroll, { passive: true });
 		import('scrollama').then(({ default: scrollama }) => {
 			scroller = scrollama();
 			scroller
 				.setup({ step: Array.from(stepsEl.querySelectorAll('.step')), offset: 0.55 })
-				.onStepEnter((/** @type {{ index: number }} */ r) => (active = r.index));
+				.onStepEnter((/** @type {{ index: number }} */ r) => {
+					active = r.index;
+					onScroll();
+				});
 			window.addEventListener('resize', onResize);
 		});
 		return () => {
 			scroller?.destroy();
 			window.removeEventListener('resize', onResize);
+			removeEventListener('scroll', onScroll);
 		};
 	});
 </script>
@@ -113,10 +127,13 @@
 	<div class="graphic">
 		<div class="stage">
 			{#key step.scene}
-				<div class="scene" transition:fade={{ duration: 300 }}>
+				<div class="scene" in:sceneIn out:sceneOut>
 					{#if step.scene === 'age'}
-						<p class="scene-label">
-							Showing: <b>{ageLabel}</b>
+						<p class="scene-label mono">
+							Showing
+							{#key ageLabel}
+								<b in:sceneIn>{ageLabel}</b>
+							{/key}
 						</p>
 						<div class="pair">
 							<BarChart question={mentalHealth} {age} {ageLabel} colors={palettes.mental_health} />
@@ -159,10 +176,15 @@
 		{#each steps as s, i (i)}
 			<div class="step" class:is-active={i === active} data-step={i}>
 				<div class="card" class:hook={!!s.hook}>
-					<p class="kicker">{s.kicker}</p>
+					<div class="card-top">
+						<p class="kicker mono">{s.kicker}</p>
+						<span class="step-no mono">{String(i + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}</span>
+					</div>
 					{#if s.hook}
-						<p class="hook-text">{s.hook}</p>
-						<p class="hint" aria-hidden="true">Scroll to find out ↓</p>
+						<p class="statement">
+							<WordReveal text={s.hook} progress={i === active ? progress : i < active ? 1 : 0} />
+						</p>
+						<p class="hint mono" aria-hidden="true">Keep scrolling ↓</p>
 					{/if}
 					{#if s.title}
 						<h3>{s.title}</h3>
@@ -172,7 +194,7 @@
 					{/each}
 					{#if s.findings}
 						<div class="findings">
-							<p class="findings-head">Key findings</p>
+							<p class="findings-head mono">Key findings</p>
 							<ul>
 								{#each s.findings as f}
 									<li>{f}</li>
@@ -188,163 +210,30 @@
 </section>
 
 <style>
-	.story {
-		position: relative;
-		display: grid;
-		grid-template-columns: minmax(16rem, 23rem) minmax(0, 1fr);
-		gap: 2rem;
-	}
-	/* Steps on the left, sticky chart on the right */
-	.steps {
-		grid-column: 1;
-		grid-row: 1;
-		position: relative;
-		z-index: 1;
-	}
-	.graphic {
-		grid-column: 2;
-		grid-row: 1;
-		position: sticky;
-		top: 0;
-		height: 100vh;
-		height: 100dvh;
-		display: flex;
-		align-items: center;
-		min-width: 0;
-	}
-	.stage {
-		display: grid;
-		width: 100%;
-	}
-	.scene {
-		grid-area: 1 / 1;
-		display: grid;
-		gap: 0.75rem;
-		min-width: 0;
-	}
 	.scene-label {
 		margin: 0;
-		font-size: 0.8rem;
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
 		color: var(--muted);
 	}
 	.scene-label b {
 		display: inline-block;
-		padding: 0.15rem 0.6rem;
+		padding: 0.3rem 0.75rem;
 		border-radius: 999px;
-		background: var(--accent);
-		color: var(--bg);
-	}
-	.pair {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-		gap: 1rem;
-	}
-	.step {
-		min-height: 90vh;
-		display: flex;
-		align-items: center;
+		background: var(--highlight);
+		color: var(--ink);
+		border: 1.5px solid var(--ink);
+		border-radius: var(--wobble-sm);
 	}
 	.step:first-child {
-		min-height: 100vh;
+		min-height: 110vh;
 	}
-	.tail {
-		height: 30vh;
-	}
-	.card {
-		display: grid;
-		gap: 0.6rem;
-		padding: 1.25rem 1.35rem;
-		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: 10px;
-		opacity: 0.35;
-		transition: opacity 300ms ease;
-		box-shadow: 0 6px 24px rgb(0 0 0 / 0.06);
-	}
-	.is-active .card {
-		opacity: 1;
-	}
-	.card p,
-	.card h3 {
-		margin: 0;
-	}
-	.kicker {
-		font-size: 0.7rem;
-		font-weight: 600;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--accent);
-	}
-	h3 {
-		font: 600 1.25rem/1.25 var(--font-display);
-		text-wrap: balance;
-	}
-	.card p {
-		font-size: 0.95rem;
-		line-height: 1.55;
-	}
-	.hook-text {
-		font: 600 clamp(1.5rem, 3vw, 2rem) / 1.25 var(--font-display) !important;
-		text-wrap: balance;
+	.card.hook {
+		padding-block: 1.8rem 1.6rem;
 	}
 	.hint {
-		font-size: 0.8rem !important;
 		color: var(--muted);
-	}
-	.findings {
-		padding: 0.75rem 0.9rem;
-		background: var(--track);
-		border-radius: 6px;
-	}
-	.findings-head {
-		margin: 0 0 0.35rem !important;
 		font-size: 0.7rem !important;
-		font-weight: 600;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-		color: var(--muted);
-	}
-	.findings ul {
-		margin: 0;
-		padding-left: 1.1rem;
-		display: grid;
-		gap: 0.4rem;
-		font-size: 0.875rem;
-		line-height: 1.45;
-	}
-
-	/* Narrow screens: chart stays pinned at the top, text cards scroll over it */
-	@media (max-width: 900px) {
-		.story {
-			display: block;
-		}
-		.graphic {
-			height: 100vh;
-			height: 100dvh;
-			align-items: flex-start;
-			padding-top: 0.5rem;
-			overflow: hidden;
-		}
-		.steps {
-			margin-top: -100vh;
-			margin-top: -100dvh;
-			pointer-events: none;
-		}
-		.card {
-			pointer-events: auto;
-			opacity: 0.95;
-		}
-		.is-active .card {
-			opacity: 1;
-		}
-		.step {
-			align-items: flex-end;
-			padding-bottom: 8vh;
-		}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.card {
-			transition: none;
-		}
 	}
 </style>

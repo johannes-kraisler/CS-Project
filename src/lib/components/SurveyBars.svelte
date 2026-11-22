@@ -1,4 +1,5 @@
 <script>
+	import { inview } from '#lib/inview.js';
 	/**
 	 * Bar view for one column of survey_0.csv. Counts are computed from `rows` (the caller passes
 	 * the subset filtered by every *other* view), so the view recomputes when filters change.
@@ -25,17 +26,18 @@
 	let n = $derived(rows.filter((r) => r[view.field] != null).length);
 	let max = $derived(Math.max(1, ...counts.map((c) => c.count)));
 	let filtered = $derived(rows.length !== total);
+	let ready = $state(false); // bars grow in from 0 the first time the chart is seen
 </script>
 
-<figure class="chart">
+<figure class="chart" use:inview={() => (ready = true)}>
 	<figcaption>
 		<h2>{view.title}</h2>
 		<p class="col">Column: “{view.column}”</p>
 	</figcaption>
 
 	<ul class="bars">
-		{#each counts as c (c.value)}
-			<li>
+		{#each counts as c, i (c.value)}
+			<li style:--i={i}>
 				<button
 					type="button"
 					class:active={selected === c.value}
@@ -46,7 +48,7 @@
 				>
 					<span class="label">{c.label}</span>
 					<span class="track">
-						<span class="bar hand-bar" style:width="{(c.count / max) * 100}%" style:--c={c.color}></span>
+						<span class="bar" style:width="{ready ? (c.count / max) * 100 : 0}%" style:background-color={c.color}></span>
 					</span>
 					<span class="value">
 						{c.count}
@@ -70,8 +72,8 @@
 		gap: 0.75rem;
 		padding: 1.25rem 1.25rem 1rem;
 		background: var(--surface);
-		border: 2px solid color-mix(in srgb, var(--fg) 60%, transparent);
-		border-radius: var(--wobble);
+		border: 1px solid var(--line);
+		border-radius: 10px;
 		min-width: 0;
 	}
 	h2 {
@@ -99,7 +101,7 @@
 		gap: 0.75rem;
 		padding: 0.25rem 0.4rem;
 		border: 1px solid transparent;
-		border-radius: var(--wobble-sm);
+		border-radius: 6px;
 		background: none;
 		color: var(--fg);
 		font: inherit;
@@ -126,16 +128,19 @@
 	}
 	.track {
 		height: 1.1rem;
-		border-bottom: 1.5px dashed color-mix(in srgb, var(--fg) 25%, transparent);
+		background: var(--track);
+		border-radius: 4px;
+		overflow: hidden;
 	}
 	.bar {
 		display: block;
 		height: 100%;
-		transition: width 300ms ease;
+		border-radius: 4px;
+		transition: width 800ms var(--ease-out) calc(var(--i) * 60ms);
 	}
 	.value {
 		text-align: right;
-		font-size: 1.05rem;
+		font-weight: 600;
 		font-variant-numeric: tabular-nums;
 	}
 	.value small {
