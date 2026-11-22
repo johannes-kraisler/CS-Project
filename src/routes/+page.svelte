@@ -1,4 +1,5 @@
 <script>
+	import Backdrop from '#lib/components/Backdrop.svelte';
 	import Story from '#lib/components/Story.svelte';
 	import StudentStory from '#lib/components/StudentStory.svelte';
 	import belongingByServices from '#lib/data/belonging-by-services.json';
@@ -34,6 +35,8 @@
 <svelte:head>
 	<title>Toronto Wellbeing by Age</title>
 </svelte:head>
+
+<Backdrop />
 
 <main>
 	<header>
@@ -103,6 +106,8 @@
 		font-family: var(--font-body);
 	}
 	main {
+		position: relative;
+		z-index: 1;
 		max-width: 78rem;
 		margin: 0 auto;
 		padding: 2.5rem 1rem 3rem;
