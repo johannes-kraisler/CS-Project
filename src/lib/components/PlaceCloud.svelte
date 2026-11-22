@@ -110,6 +110,7 @@
 					}}
 				>
 					<circle r={b.r} style:--c={b.color} />
+					<circle class="pen2" r={b.r} style:--c={b.color} />
 					{#each lines(b.name) as line, li (li)}
 						<text
 							class="word"
@@ -147,8 +148,8 @@
 		gap: 0.6rem;
 		padding: 1.1rem 1.25rem 1rem;
 		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: 10px;
+		border: 2px solid color-mix(in srgb, var(--fg) 60%, transparent);
+		border-radius: var(--wobble);
 		min-width: 0;
 	}
 	h2 {
@@ -175,11 +176,20 @@
 	.bubble circle {
 		fill: color-mix(in srgb, var(--c) 22%, var(--surface));
 		stroke: var(--c);
-		stroke-width: 2;
+		stroke-width: 2.2;
+		filter: url(#sketch);
 		transition: fill 200ms ease;
 	}
-	.bubble:hover circle,
-	.bubble.sel circle {
+	/* Second, offset pen stroke for a sketched double line. */
+	.bubble circle.pen2 {
+		fill: none;
+		stroke-width: 1.2;
+		stroke-opacity: 0.6;
+		filter: url(#sketch-alt);
+		pointer-events: none;
+	}
+	.bubble:hover circle:not(.pen2),
+	.bubble.sel circle:not(.pen2) {
 		fill: color-mix(in srgb, var(--c) 40%, var(--surface));
 	}
 	.bubble.sel circle,
@@ -189,8 +199,7 @@
 	}
 	.word {
 		fill: var(--fg);
-		font-family: var(--font-display);
-		font-weight: 600;
+		font-family: var(--font-hand);
 		pointer-events: none;
 	}
 	.n {
@@ -207,7 +216,7 @@
 		min-height: 2.6rem;
 		padding: 0.6rem 0.8rem;
 		background: var(--track);
-		border-radius: 6px;
+		border-radius: var(--wobble);
 		font-size: 0.85rem;
 		line-height: 1.45;
 	}

@@ -46,7 +46,7 @@
 				>
 					<span class="label">{c.label}</span>
 					<span class="track">
-						<span class="bar" style:width="{(c.count / max) * 100}%" style:background={c.color}></span>
+						<span class="bar hand-bar" style:width="{(c.count / max) * 100}%" style:--c={c.color}></span>
 					</span>
 					<span class="value">
 						{c.count}
@@ -70,8 +70,8 @@
 		gap: 0.75rem;
 		padding: 1.25rem 1.25rem 1rem;
 		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: 10px;
+		border: 2px solid color-mix(in srgb, var(--fg) 60%, transparent);
+		border-radius: var(--wobble);
 		min-width: 0;
 	}
 	h2 {
@@ -99,7 +99,7 @@
 		gap: 0.75rem;
 		padding: 0.25rem 0.4rem;
 		border: 1px solid transparent;
-		border-radius: 6px;
+		border-radius: var(--wobble-sm);
 		background: none;
 		color: var(--fg);
 		font: inherit;
@@ -126,19 +126,16 @@
 	}
 	.track {
 		height: 1.1rem;
-		background: var(--track);
-		border-radius: 4px;
-		overflow: hidden;
+		border-bottom: 1.5px dashed color-mix(in srgb, var(--fg) 25%, transparent);
 	}
 	.bar {
 		display: block;
 		height: 100%;
-		border-radius: 4px;
 		transition: width 300ms ease;
 	}
 	.value {
 		text-align: right;
-		font-weight: 600;
+		font-size: 1.05rem;
 		font-variant-numeric: tabular-nums;
 	}
 	.value small {

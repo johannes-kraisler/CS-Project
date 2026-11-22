@@ -47,7 +47,7 @@
 			<li>
 				<span class="label">{row.label}</span>
 				<span class="track">
-					<span class="bar" style:width="{(row.value / max) * 100}%" style:background={row.color}></span>
+					<span class="bar hand-bar" style:width="{(row.value / max) * 100}%" style:--c={row.color}></span>
 					{#if comparing}
 						<span
 							class="marker"
@@ -92,8 +92,8 @@
 		gap: 1rem;
 		padding: 1.25rem 1.25rem 1rem;
 		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: 10px;
+		border: 2px solid color-mix(in srgb, var(--fg) 60%, transparent);
+		border-radius: var(--wobble);
 		min-width: 0;
 	}
 	h2 {
@@ -126,13 +126,11 @@
 	.track {
 		position: relative;
 		height: 1.4rem;
-		background: var(--track);
-		border-radius: 4px;
+		border-bottom: 1.5px dashed color-mix(in srgb, var(--fg) 25%, transparent);
 	}
 	.bar {
 		position: absolute;
 		inset: 0 auto 0 0;
-		border-radius: 4px;
 		transition: width 350ms ease;
 	}
 	.marker {
@@ -142,17 +140,18 @@
 		width: 2px;
 		margin-left: -1px;
 		background: var(--fg);
+		filter: url(#sketch);
 		transition: left 350ms ease;
 	}
 	.value {
 		text-align: right;
 		font-variant-numeric: tabular-nums;
-		font-weight: 600;
+		font-size: 1.1rem;
 	}
 	.caption {
 		padding: 0.75rem 0.9rem;
 		background: var(--track);
-		border-radius: 6px;
+		border-radius: var(--wobble);
 		font-size: 0.85rem;
 		line-height: 1.45;
 	}

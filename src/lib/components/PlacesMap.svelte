@@ -175,7 +175,7 @@
 	<div class="below">
 		<ul class="legend">
 			{#each GROUPS as g (g.id)}
-				<li><span class="swatch" style:background={g.color}></span>{g.label}</li>
+				<li><span class="swatch hand-bar" style:--c={g.color}></span>{g.label}</li>
 			{/each}
 		</ul>
 		<p class="count">{points.length} of {total} students' places shown{points.length !== total ? ' (filtered)' : ''}</p>
@@ -203,8 +203,8 @@
 		gap: 0.6rem;
 		padding: 1.1rem 1.25rem 1rem;
 		background: var(--surface);
-		border: 1px solid var(--line);
-		border-radius: 10px;
+		border: 2px solid color-mix(in srgb, var(--fg) 60%, transparent);
+		border-radius: var(--wobble);
 		min-width: 0;
 	}
 	h2 {
@@ -232,7 +232,7 @@
 		min-width: 2.1rem;
 		padding: 0.3rem 0.65rem;
 		border: 1px solid var(--line);
-		border-radius: 6px;
+		border-radius: var(--wobble-sm);
 		background: var(--surface);
 		color: var(--fg);
 		font: inherit;
@@ -253,8 +253,8 @@
 	}
 	.map {
 		position: relative;
-		border: 1px solid var(--line);
-		border-radius: 8px;
+		border: 1.5px solid color-mix(in srgb, var(--fg) 40%, transparent);
+		border-radius: var(--wobble);
 		overflow: hidden;
 		background: var(--bg);
 	}
@@ -271,8 +271,9 @@
 	}
 	.hood {
 		fill: var(--track);
-		stroke: var(--line);
+		stroke: color-mix(in srgb, var(--fg) 30%, transparent);
 		stroke-width: 1;
+		stroke-dasharray: 5 1.5 9 2;
 		vector-effect: non-scaling-stroke;
 	}
 	.hood-label {
@@ -294,8 +295,9 @@
 		pointer-events: none;
 	}
 	.dot {
-		stroke: var(--surface);
-		stroke-width: 2;
+		stroke: var(--fg);
+		stroke-width: 1.5;
+		filter: url(#sketch);
 		cursor: pointer;
 	}
 	.dot.sel {
@@ -309,8 +311,7 @@
 	}
 	.dot-label {
 		fill: var(--fg);
-		font-size: 12px;
-		font-weight: 600;
+		font-size: 14px;
 		paint-order: stroke;
 		stroke: var(--surface);
 		stroke-width: 3px;
@@ -340,7 +341,7 @@
 	.swatch {
 		width: 0.7rem;
 		height: 0.7rem;
-		border-radius: 50%;
+		border-radius: 50% 45% 55% 48%;
 	}
 	.count {
 		margin: 0;
@@ -352,7 +353,7 @@
 		min-height: 3.2rem;
 		padding: 0.6rem 0.8rem;
 		background: var(--track);
-		border-radius: 6px;
+		border-radius: var(--wobble);
 		font-size: 0.85rem;
 		line-height: 1.45;
 	}
