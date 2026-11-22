@@ -95,7 +95,7 @@
 		<ChapterOpener
 			number="01"
 			title="The city"
-			deck="What 7,222 Torontonians told the City about their mental health, their sense of belonging and the community services they use."
+			hook={"Only half of Toronto residents\nreported good mental health\nand a sense of belonging.\nWhat about the other half?"}
 		/>
 	</div>
 </div>

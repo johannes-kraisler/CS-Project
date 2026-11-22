@@ -151,11 +151,14 @@ a {
 	position: relative;
 	display: grid;
 	gap: 0.7rem;
-	padding: 1.5rem 1.5rem 1.5rem 1.7rem;
-	background: var(--surface);
-	border: 2px solid var(--ink);
-	border-radius: var(--wobble);
-	box-shadow: var(--shadow);
+	padding: 2.1rem 1.5rem 1.6rem 1.7rem;
+	/* Yellow sticky note: no outline, square-ish corners, soft lifted shadow */
+	background: color-mix(in srgb, var(--oi-yellow) 48%, #fffdf2);
+	border: 0;
+	border-radius: 2px 2px 3px 18px / 2px 2px 3px 10px;
+	box-shadow:
+		0 1px 1px rgb(0 0 0 / 0.08),
+		2px 12px 18px -10px rgb(60 50 0 / 0.45);
 	opacity: 0.35;
 	transform: translateY(18px) rotate(-1.2deg) scale(0.98);
 	transition:
@@ -165,19 +168,17 @@ a {
 .story .step:nth-child(even) .card {
 	transform: translateY(18px) rotate(1deg) scale(0.98);
 }
-/* Strip of "tape" holding the card */
+/* Sticky note's glue strip: a slightly darker band across the top */
 .story .card::after {
 	content: '';
 	position: absolute;
-	top: -12px;
-	left: 50%;
-	width: 5.5rem;
-	height: 1.5rem;
-	translate: -50% 0;
-	rotate: -3deg;
-	background: color-mix(in srgb, var(--oi-yellow) 55%, transparent);
-	border-left: 1px dashed rgb(0 0 0 / 0.15);
-	border-right: 1px dashed rgb(0 0 0 / 0.15);
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 1.2rem;
+	border-radius: 2px 2px 0 0;
+	background: linear-gradient(to bottom, rgb(120 100 0 / 0.1), rgb(120 100 0 / 0.03));
+	pointer-events: none;
 }
 /* Marker stroke down the left edge, drawn in when the card becomes active */
 .story .card::before {
@@ -230,8 +231,8 @@ a {
 }
 .story .findings {
 	padding: 0.85rem 1rem;
-	background: var(--bg);
-	border: 1.5px dashed var(--muted);
+	background: rgb(255 255 255 / 0.35);
+	border: 1.5px dashed rgb(28 26 23 / 0.35);
 	border-radius: var(--wobble-sm);
 }
 .story .findings-head {

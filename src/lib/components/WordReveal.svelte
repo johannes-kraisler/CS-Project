@@ -3,11 +3,27 @@
 	 * Text that gets "highlighted with a marker" word by word as `progress` goes from 0 to 1 (scroll-linked).
 	 * Unlit words are faint pencil; lit words turn to ink with a yellow highlighter stroke sweeping behind them.
 	 * The full sentence is always in the DOM, so screen readers and search read it normally.
-	 * @type {{ text: string, progress: number, start?: number, end?: number }}
+	 * A newline (\n) in `text` forces a line break there.
+	 * `highlight="last-line"` keeps the yellow highlighter for the last line only (the rest just turns to ink).
+	 * @type {{ text: string, progress: number, start?: number, end?: number, highlight?: 'all' | 'last-line' }}
 	 */
-	let { text, progress, start = 0.05, end = 0.55 } = $props();
+	let { text, progress, start = 0.05, end = 0.55, highlight = 'all' } = $props();
 
-	let words = $derived(text.split(/\s+/));
+	// Each word remembers whether a forced line break (\n) comes right after it.
+	let words = $derived(
+		text
+			.split(/\n/)
+			.flatMap((line, li, lines) =>
+				line
+					.trim()
+					.split(/\s+/)
+					.map((w, wi, ws) => ({
+						w,
+						br: wi === ws.length - 1 && li < lines.length - 1,
+						hl: highlight === 'all' || li === lines.length - 1
+					}))
+			)
+	);
 	let t = $derived(Math.min(1, Math.max(0, (progress - start) / (end - start))));
 	let lit = $derived(t * words.length);
 </script>
@@ -15,7 +31,7 @@
 <span class="reveal">
 	{#each words as w, i (i)}
 		<!-- The trailing space sits inside the span so the highlight reads as one continuous stroke -->
-		<span class="w" class:on={i < lit}>{w}{i < words.length - 1 ? ' ' : ''}</span>
+		<span class="w" class:on={i < lit} class:plain={!w.hl}>{w.w}{i < words.length - 1 && !w.br ? ' ' : ''}</span>{#if w.br}<br />{/if}
 	{/each}
 </span>
 
@@ -41,5 +57,8 @@
 	.w.on {
 		color: var(--fg);
 		background-size: 100% 55%;
+	}
+	.w.plain {
+		background-image: none;
 	}
 </style>

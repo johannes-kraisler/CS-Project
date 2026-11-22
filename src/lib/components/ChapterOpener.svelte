@@ -1,12 +1,20 @@
 <script>
 	import { onMount } from 'svelte';
+	import { Tween } from 'svelte/motion';
+	import { cubicInOut } from 'svelte/easing';
+	import WordReveal from '#lib/components/WordReveal.svelte';
+	import { reducedMotion } from '#lib/motion.js';
 
 	/**
 	 * Full-screen numbered chapter title. Its parts rise in one after another when it scrolls into view.
 	 * `data-chapter` lets the progress HUD know which chapter the reader is in.
-	 * @type {{ number: string, title: string, deck: string }}
+	 * `hook` (optional) is shown instead of the deck as a big statement whose words get highlighted
+	 * one after another once the opener is in view.
+	 * @type {{ number: string, title: string, deck?: string, hook?: string }}
 	 */
-	let { number, title, deck } = $props();
+	let { number, title, deck = '', hook = '' } = $props();
+
+	const reveal = new Tween(0, { duration: 2400, easing: cubicInOut });
 
 	/** @type {HTMLElement} */
 	let el;
@@ -17,6 +25,8 @@
 			([e]) => {
 				if (e.isIntersecting) {
 					visible = true;
+					if (reducedMotion()) reveal.set(1, { duration: 0 });
+					else setTimeout(() => (reveal.target = 1), 700);
 					io.disconnect();
 				}
 			},
@@ -35,7 +45,11 @@
 	<svg class="rule" viewBox="0 0 220 24" aria-hidden="true">
 		<path pathLength="1" d="M4 15 C 30 4, 52 22, 80 12 S 130 4, 156 14 S 200 18, 216 8" />
 	</svg>
-	<p class="deck">{deck}</p>
+	{#if hook}
+		<p class="deck hook"><WordReveal text={hook} progress={reveal.current} start={0} end={1} highlight="last-line" /></p>
+	{:else}
+		<p class="deck">{deck}</p>
+	{/if}
 </section>
 
 <style>
@@ -77,6 +91,16 @@
 		font-size: clamp(1.1rem, 1.7vw, 1.3rem);
 		line-height: 1.55;
 		color: var(--muted);
+	}
+	.deck.hook {
+		position: relative; /* above the big chapter number */
+		justify-self: center;
+		text-align: center;
+		max-width: 100%; /* line breaks come from \n in the hook text */
+		margin-top: 0.8rem;
+		font: 700 clamp(2.2rem, 4vw, 3.4rem) / 1.1 var(--font-display);
+		color: var(--ink);
+		text-wrap: pretty;
 	}
 	.rule {
 		width: min(16rem, 60vw);

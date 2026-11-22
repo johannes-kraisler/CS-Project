@@ -76,11 +76,12 @@ const PLACE_TYPES = [
 	'Online gaming',
 	'Other'
 ];
+// The survey only worded the two ends of the 1–5 scale; the middle labels are ours, for readability.
 export const CONNECTION_LABELS = {
 	1: '1 – Not connected at all',
-	2: '2',
-	3: '3',
-	4: '4',
+	2: '2 – Slightly connected',
+	3: '3 – Moderately connected',
+	4: '4 – Quite connected',
 	5: '5 – Very connected'
 };
 

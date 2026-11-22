@@ -25,12 +25,6 @@
 	const steps = [
 		{
 			scene: 'age',
-			age: 'all',
-			kicker: 'Hook',
-			hook: 'Only half of Toronto residents reported good mental health and a sense of belonging. What about the other half?'
-		},
-		{
-			scene: 'age',
 			age: '18-24',
 			kicker: 'Rising action · Age',
 			title: 'Mental health improves with age',
