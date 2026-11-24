@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { sceneIn, swapIn, swapOut } from '#lib/motion.js';
+	import { sceneIn } from '#lib/motion.js';
 	import WordReveal from '#lib/components/WordReveal.svelte';
 	import BarChart from '#lib/components/BarChart.svelte';
 	import BelongingLines from '#lib/components/BelongingLines.svelte';
@@ -56,9 +56,7 @@
 			title: 'Belonging and mental health go together',
 			findings: [
 				'The better people rate their mental health, the more likely they are to feel a strong sense of belonging.',
-				'Weak belonging does the opposite: it rises from 27% among people with excellent mental health to 77% among those with poor mental health. The lines cross at "Good".',
-				'Strong belonging drops at every step down the scale. The biggest drop is from "Good" (45%) to "Fair" (28%).',
-				'This shows the two go together, not that one causes the other.'
+				'This shows the two go together.'
 			]
 		},
 		{
@@ -66,7 +64,7 @@
 			selected: 'Very frequently',
 			title: 'People who use community services feel they belong more',
 			findings: [
-				'The more often people use community centres and programs, the stronger their sense of belonging: from 42% among people who never use them to 70% among very frequent users.',
+				'The more often people use community centres and programs, the stronger their sense of belonging.',
 				'Among very frequent users, 24% feel very strongly connected, twice the city average (12%).',
 				'The correlation is clear across groups but weak for individuals (ρ = 0.19): many people feel connected without using services, and some users still feel isolated.',
 				'Community spaces may build connection, but people who already feel connected may also be more likely to show up.'
@@ -93,6 +91,16 @@
 
 	let mentalHealth = $derived(data.questions.find((/** @type {any} */ q) => q.id === 'mental_health'));
 	let belonging = $derived(data.questions.find((/** @type {any} */ q) => q.id === 'belonging'));
+
+	/** @param {string} label */
+	const mhHeading = (label) => `People with ${label.toLowerCase()} mental health`;
+	/** @param {string} label */
+	const serviceHeading = (label) => {
+		const p = servicePoints.find((x) => x.label === label);
+		return label === 'Never'
+			? 'People who never used community services'
+			: `People who used services ${label.toLowerCase()} (${p?.detail} a year)`;
+	};
 
 	/** @type {HTMLElement} */
 	let rootEl;
@@ -189,38 +197,20 @@
 	<section class="story">
 		<div class="graphic">
 			<div class="stage">
-				{#key lineStep.scene}
-					<div class="scene" in:swapIn out:swapOut>
-						{#if lineStep.scene === 'mh'}
-							<BelongingLines
-								id="story-mh"
-								compact
-								title="Belonging and mental health"
-								intro=""
-								pickerLegend=""
-								points={mhPoints}
-								selected={lineStep.selected}
-								heading={(label) => `People with ${label.toLowerCase()} mental health`}
-							/>
-						{:else}
-							<BelongingLines
-								id="story-services"
-								compact
-								title="Community services and belonging"
-								intro=""
-								pickerLegend=""
-								points={servicePoints}
-								selected={lineStep.selected}
-								heading={(label) => {
-									const p = servicePoints.find((x) => x.label === label);
-									return label === 'Never'
-										? 'People who never used community services'
-										: `People who used services ${label.toLowerCase()} (${p?.detail} a year)`;
-								}}
-							/>
-						{/if}
-					</div>
-				{/key}
+				<!-- One frame for both line charts: moving from mental health to community services
+				     rewrites the chart's contents in place instead of swapping the whole chart -->
+				<div class="scene">
+					<BelongingLines
+						id="story-lines"
+						compact
+						title={lineStep.scene === 'mh' ? 'Belonging and mental health' : 'Community services and belonging'}
+						intro=""
+						pickerLegend=""
+						points={lineStep.scene === 'mh' ? mhPoints : servicePoints}
+						selected={lineStep.selected}
+						heading={lineStep.scene === 'mh' ? mhHeading : serviceHeading}
+					/>
+				</div>
 			</div>
 		</div>
 		{@render cards(chapters[1])}

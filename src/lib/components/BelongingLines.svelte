@@ -1,5 +1,7 @@
 <script>
+	import { untrack } from 'svelte';
 	import { inview } from '#lib/inview.js';
+	import { reducedMotion } from '#lib/motion.js';
 	/**
 	 * Two lines across the categories of one question: % with a strong and % with a weak sense
 	 * of belonging in each category. The viewer picks a category (buttons or clicking the chart)
@@ -52,7 +54,13 @@
 	const innerW = W - pad.left - pad.right;
 	const innerH = H - pad.top - pad.bottom;
 
-	let step = $derived(innerW / points.length);
+	// When `points` changes (e.g. the story moves to a new question) the frame stays put and its
+	// contents are rewritten: the old title, lines and summary fade out, then the new ones draw in.
+	let shownPoints = $state.raw(untrack(() => points));
+	let swapping = $derived(shownPoints !== points);
+	let leaving = $state(false);
+
+	let step = $derived(innerW / shownPoints.length);
 	/** @param {number} i */
 	const cx = (i) => pad.left + step * (i + 0.5);
 	/** @param {number} v */
@@ -63,17 +71,23 @@
 	const STRONG = 'var(--good-2)';
 	const WEAK = 'var(--bad-2)';
 	let lines = $derived([
-		{ key: 'strong', label: lineLabels[0], values: points.map((p) => p.strong), color: STRONG },
-		{ key: 'weak', label: lineLabels[1], values: points.map((p) => p.weak), color: WEAK }
+		{ key: 'strong', label: lineLabels[0], values: shownPoints.map((p) => p.strong), color: STRONG },
+		{ key: 'weak', label: lineLabels[1], values: shownPoints.map((p) => p.weak), color: WEAK }
 	]);
 	// Label a point below it only when the other line sits just above it (avoids overlap).
 	/** @param {number} v @param {number} other */
 	const labelAbove = (v, other) => !(other > v && other - v < 8);
 
-	let last = $derived(points.length - 1);
+	let last = $derived(shownPoints.length - 1);
 
-	let sel = $derived(points.find((p) => p.label === selected) ?? points[last]);
-	let selIndex = $derived(points.indexOf(sel));
+	// While the old contents fade out, keep showing what was there before the swap.
+	let held = $state.raw(untrack(() => ({ title, heading, label: selected })));
+	let shownTitle = $derived(swapping ? held.title : title);
+	let shownHeading = $derived(swapping ? held.heading : heading);
+	let selLabel = $derived(swapping ? held.label : selected);
+
+	let sel = $derived(shownPoints.find((p) => p.label === selLabel) ?? shownPoints[last]);
+	let selIndex = $derived(shownPoints.indexOf(sel));
 
 	/** @param {{ strong: number, weak: number }} p */
 	const comparison = (p) => {
@@ -97,11 +111,42 @@
 	};
 	let cmp = $derived(comparison(sel));
 	let drawn = $state(false); // lines draw themselves the first time the chart is seen
+
+	$effect(() => {
+		if (!swapping) held = { title, heading, label: sel.label };
+	});
+
+	$effect(() => {
+		const next = points;
+		if (untrack(() => next === shownPoints)) return;
+		if (reducedMotion()) {
+			shownPoints = next;
+			return;
+		}
+		leaving = true;
+		/** @type {number} */
+		let raf;
+		const t = setTimeout(() => {
+			// Swap while hidden, with the lines reset to undrawn, then reveal and redraw.
+			shownPoints = next;
+			drawn = false;
+			raf = requestAnimationFrame(() => {
+				raf = requestAnimationFrame(() => {
+					leaving = false;
+					drawn = true;
+				});
+			});
+		}, 320);
+		return () => {
+			clearTimeout(t);
+			cancelAnimationFrame(raf);
+		};
+	});
 </script>
 
-<figure class="chart" class:compact class:drawn use:inview={() => (drawn = true)}>
+<figure class="chart" class:compact class:drawn class:leaving use:inview={() => (drawn = true)}>
 	<figcaption>
-		<h2>{title}</h2>
+		<h2>{shownTitle}</h2>
 		<p class="q">{intro}</p>
 	</figcaption>
 
@@ -123,8 +168,8 @@
 		<svg
 			viewBox="0 0 {W} {H}"
 			role="img"
-			aria-label="{title}. {points
-				.map((p) => `${heading(p.label)}: ${p.strong.toFixed(0)}% strong belonging, ${p.weak.toFixed(0)}% weak belonging`)
+			aria-label="{shownTitle}. {shownPoints
+				.map((p) => `${shownHeading(p.label)}: ${p.strong.toFixed(0)}% strong belonging, ${p.weak.toFixed(0)}% weak belonging`)
 				.join('. ')}"
 		>
 			<!-- Selected rating -->
@@ -139,9 +184,9 @@
 				<text class="tick" x={pad.left - 10} y={y(t)} text-anchor="end" dominant-baseline="middle">{t}%</text>
 			{/each}
 
-			{#each points as p, i (p.label)}
-				<text class="xl" class:hl={p.label === selected} x={cx(i)} y={H - pad.bottom + 22} text-anchor="middle">{p.label}</text>
-				<text class="tick" x={cx(i)} y={H - pad.bottom + 40} text-anchor="middle">{count(p.n)}</text>
+			{#each shownPoints as p, i (p.label)}
+				<text class="xl" class:hl={p.label === selLabel} x={cx(i)} y={H - pad.bottom + 22} text-anchor="middle">{p.label}</text>
+				<text class="tick count" x={cx(i)} y={H - pad.bottom + 40} text-anchor="middle">{count(p.n)}</text>
 			{/each}
 
 			{#each lines as l (l.key)}
@@ -168,7 +213,7 @@
 			{/each}
 
 			<!-- Click a rating on the chart to select it (the buttons above are the keyboard-accessible control) -->
-			{#each points as p, i (p.label)}
+			{#each shownPoints as p, i (p.label)}
 				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
 				<rect class="hit" x={cx(i) - step / 2} y={pad.top - 52} width={step} height={innerH + 52 + 50} onclick={() => (selected = p.label)} />
 			{/each}
@@ -177,7 +222,7 @@
 
 	<div class="summary" class:strong={!cmp.weakMore} aria-live="polite">
 		<p class="summary-head">
-			<b>{heading(sel.label)}</b>
+			<b>{shownHeading(sel.label)}</b>
 			<span>{count(sel.n)}</span>
 		</p>
 		<div class="summary-bars">
@@ -248,6 +293,31 @@
 	.plot {
 		max-width: 54rem;
 	}
+	/* Rewriting the contents when the data changes (see `leaving` above). Only what differs
+	   between questions fades out and back in; the frame, axis and gridlines stay put. */
+	h2,
+	.xl,
+	.count,
+	.summary-head,
+	.sbar-val,
+	.summary-text {
+		transition: opacity 300ms ease;
+	}
+	.chart.leaving h2,
+	.chart.leaving .xl,
+	.chart.leaving .count,
+	.chart.leaving .band-g,
+	.chart.leaving .line,
+	.chart.leaving .pt,
+	.chart.leaving .val,
+	.chart.leaving .end,
+	.chart.leaving .summary-head,
+	.chart.leaving .sbar-val,
+	.chart.leaving .summary-text {
+		opacity: 0;
+		/* Fade only, so the lines and band reset instantly while hidden */
+		transition: opacity 300ms ease;
+	}
 	.compact .q {
 		display: none;
 	}
@@ -279,7 +349,9 @@
 	}
 	.band-g {
 		--band: var(--bad-2);
-		transition: transform 300ms ease;
+		transition:
+			transform 300ms ease,
+			opacity 300ms ease;
 	}
 	.band-g.strong {
 		--band: var(--good-2);
