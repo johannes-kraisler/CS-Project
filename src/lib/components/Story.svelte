@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
-	import { sceneIn, sceneOut } from '#lib/motion.js';
+	import { sceneIn, swapIn, swapOut } from '#lib/motion.js';
 	import WordReveal from '#lib/components/WordReveal.svelte';
 	import BarChart from '#lib/components/BarChart.svelte';
 	import BelongingLines from '#lib/components/BelongingLines.svelte';
@@ -37,21 +37,25 @@
 			age: '25-34',
 			title: '25–34s feel the least connected',
 			text: [
-				'They are the only age group where most people (53%) report a weak sense of belonging.'
+				'They are the only age group where most people (53%) report a weak sense of belonging.',
+				'Their mental health is almost as low as 18–24s: 31% say Fair or Poor (city average 21%), and only 38% say Excellent or Very good.'
 			]
 		},
 		{
 			scene: 'age',
 			age: '55+',
 			title: 'People 55+ feel the most connected',
-			text: ['People 55+ feel the most connected: 58% strong and 34% weak.']
+			text: [
+				'58% strong and 34% weak.',
+				'They also report the best mental health: 67% say Excellent or Very good (city average 52%), and only 12% say Fair or Poor.'
+			]
 		},
 		{
 			scene: 'mh',
 			selected: 'Poor',
 			title: 'Belonging and mental health go together',
 			findings: [
-				'The better people rate their mental health, the more likely they are to feel a strong sense of belonging: 67% of those with excellent mental health, compared with 18% of those with poor mental health.',
+				'The better people rate their mental health, the more likely they are to feel a strong sense of belonging.',
 				'Weak belonging does the opposite: it rises from 27% among people with excellent mental health to 77% among those with poor mental health. The lines cross at "Good".',
 				'Strong belonging drops at every step down the scale. The biggest drop is from "Good" (45%) to "Fair" (28%).',
 				'This shows the two go together, not that one causes the other.'
@@ -72,15 +76,26 @@
 
 	let active = $state(0);
 	let progress = $state(0); // 0–1 through the active step, drives the word reveal
-	let step = $derived(steps[active]);
-	let age = $derived(step.age ?? 'all');
+
+	// Two chapters, each with its own sticky chart: the age bar charts, then the belonging line charts.
+	// Splitting them means the bar charts scroll off the page and the line chart scrolls on,
+	// just like the cards, instead of swapping in place.
+	const idx = steps.map((_, i) => i);
+	const chapters = [idx.filter((i) => steps[i].scene === 'age'), idx.filter((i) => steps[i].scene !== 'age')];
+	/** The step a chapter's chart shows: the active one if it's in the chapter, else its nearest end. */
+	const shownIn = (/** @type {number[]} */ ch) =>
+		ch.includes(active) ? active : active < ch[0] ? ch[0] : ch[ch.length - 1];
+
+	let ageStep = $derived(steps[shownIn(chapters[0])]);
+	let lineStep = $derived(steps[shownIn(chapters[1])]);
+	let age = $derived(ageStep.age ?? 'all');
 	let ageLabel = $derived(data.ageGroups.find((/** @type {any} */ g) => g.id === age)?.label ?? 'All ages');
 
 	let mentalHealth = $derived(data.questions.find((/** @type {any} */ q) => q.id === 'mental_health'));
 	let belonging = $derived(data.questions.find((/** @type {any} */ q) => q.id === 'belonging'));
 
 	/** @type {HTMLElement} */
-	let stepsEl;
+	let rootEl;
 
 	onMount(() => {
 		/** @type {any} */
@@ -88,7 +103,7 @@
 		const onResize = () => scroller?.resize();
 		// How far (0–1) the reader is through the active step, measured at the same 55% line as scrollama.
 		const onScroll = () => {
-			const el = stepsEl.querySelectorAll('.step')[active];
+			const el = rootEl.querySelectorAll('.step')[active];
 			if (!el) return;
 			const r = el.getBoundingClientRect();
 			progress = Math.min(1, Math.max(0, (innerHeight * 0.55 - r.top) / r.height));
@@ -97,7 +112,7 @@
 		import('scrollama').then(({ default: scrollama }) => {
 			scroller = scrollama();
 			scroller
-				.setup({ step: Array.from(stepsEl.querySelectorAll('.step')), offset: 0.55 })
+				.setup({ step: Array.from(rootEl.querySelectorAll('.step')), offset: 0.55 })
 				.onStepEnter((/** @type {{ index: number }} */ r) => {
 					active = r.index;
 					onScroll();
@@ -112,57 +127,10 @@
 	});
 </script>
 
-<section class="story" aria-label="Story: wellbeing and belonging in Toronto">
-	<div class="graphic">
-		<div class="stage">
-			{#key step.scene}
-				<div class="scene" in:sceneIn out:sceneOut>
-					{#if step.scene === 'age'}
-						<p class="scene-label mono">
-							Showing
-							{#key ageLabel}
-								<b in:sceneIn>{ageLabel}</b>
-							{/key}
-						</p>
-						<div class="pair">
-							<BarChart question={mentalHealth} {age} {ageLabel} colors={palettes.mental_health} />
-							<BarChart question={belonging} {age} {ageLabel} colors={palettes.belonging} />
-						</div>
-					{:else if step.scene === 'mh'}
-						<BelongingLines
-							id="story-mh"
-							compact
-							title="Belonging and mental health"
-							intro=""
-							pickerLegend=""
-							points={mhPoints}
-							selected={step.selected}
-							heading={(label) => `People with ${label.toLowerCase()} mental health`}
-						/>
-					{:else}
-						<BelongingLines
-							id="story-services"
-							compact
-							title="Community services and belonging"
-							intro=""
-							pickerLegend=""
-							points={servicePoints}
-							selected={step.selected}
-							heading={(label) => {
-								const p = servicePoints.find((x) => x.label === label);
-								return label === 'Never'
-									? 'People who never used community services'
-									: `People who used services ${label.toLowerCase()} (${p?.detail} a year)`;
-							}}
-						/>
-					{/if}
-				</div>
-			{/key}
-		</div>
-	</div>
-
-	<div class="steps" bind:this={stepsEl}>
-		{#each steps as s, i (i)}
+{#snippet cards(/** @type {number[]} */ chapter)}
+	<div class="steps">
+		{#each chapter as i (i)}
+			{@const s = steps[i]}
 			<div class="step" class:is-active={i === active} data-step={i}>
 				<div class="card" class:hook={!!s.hook}>
 					<div class="card-top corner">
@@ -195,9 +163,84 @@
 		{/each}
 		<div class="tail" aria-hidden="true"></div>
 	</div>
-</section>
+{/snippet}
+
+<div bind:this={rootEl} role="region" aria-label="Story: wellbeing and belonging in Toronto">
+	<section class="story">
+		<div class="graphic">
+			<div class="stage">
+				<div class="scene">
+					<p class="scene-label mono">
+						Showing
+						{#key ageLabel}
+							<b in:sceneIn>{ageLabel}</b>
+						{/key}
+					</p>
+					<div class="pair">
+						<BarChart question={mentalHealth} {age} {ageLabel} colors={palettes.mental_health} />
+						<BarChart question={belonging} {age} {ageLabel} colors={palettes.belonging} />
+					</div>
+				</div>
+			</div>
+		</div>
+		{@render cards(chapters[0])}
+	</section>
+
+	<section class="story">
+		<div class="graphic">
+			<div class="stage">
+				{#key lineStep.scene}
+					<div class="scene" in:swapIn out:swapOut>
+						{#if lineStep.scene === 'mh'}
+							<BelongingLines
+								id="story-mh"
+								compact
+								title="Belonging and mental health"
+								intro=""
+								pickerLegend=""
+								points={mhPoints}
+								selected={lineStep.selected}
+								heading={(label) => `People with ${label.toLowerCase()} mental health`}
+							/>
+						{:else}
+							<BelongingLines
+								id="story-services"
+								compact
+								title="Community services and belonging"
+								intro=""
+								pickerLegend=""
+								points={servicePoints}
+								selected={lineStep.selected}
+								heading={(label) => {
+									const p = servicePoints.find((x) => x.label === label);
+									return label === 'Never'
+										? 'People who never used community services'
+										: `People who used services ${label.toLowerCase()} (${p?.detail} a year)`;
+								}}
+							/>
+						{/if}
+					</div>
+				{/key}
+			</div>
+		</div>
+		{@render cards(chapters[1])}
+	</section>
+</div>
 
 <style>
+	/* The stage fills the sticky panel and each chart centres itself in it, so swapping
+	   between charts of different heights doesn't make the panel jump */
+	.graphic .stage {
+		height: 100%;
+	}
+	.graphic .scene {
+		align-self: center;
+	}
+	@media (max-width: 900px) {
+		.graphic .scene {
+			align-self: start;
+		}
+	}
 	/* Step number sits in the card's top-right corner so the title starts at the top */
 	.card-top.corner {
 		position: absolute;
