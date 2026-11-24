@@ -19,40 +19,36 @@
 
 	/**
 	 * @typedef {{ scene: 'age' | 'mh' | 'services', age?: string, selected?: string,
-	 *   kicker: string, hook?: string, title?: string, text?: string[], findings?: string[] }} Step
+	 *   hook?: string, title?: string, text?: string[], findings?: string[] }} Step
 	 * @type {Step[]}
 	 */
 	const steps = [
 		{
 			scene: 'age',
 			age: '18-24',
-			kicker: 'Rising action · Age',
 			title: 'Mental health improves with age',
 			text: [
-				'Self-rated mental health improves steadily with age.',
-				'Younger adults (18–34) report the worst mental health. About a third of 18–24s say Fair or Poor (32%), and 12% say Poor, which is twice the city average.'
+				'Younger adults (18–34) report the worst mental health.',
+				'About a third of 18–24s say Fair or Poor (32%), and 12% say Poor, which is twice the city average.'
 			]
 		},
 		{
 			scene: 'age',
 			age: '25-34',
-			kicker: 'Rising action · Age',
 			title: '25–34s feel the least connected',
 			text: [
-				'People aged 25–34 feel the least connected. They are the only age group where most people (53%) report a weak sense of belonging.'
+				'They are the only age group where most people (53%) report a weak sense of belonging.'
 			]
 		},
 		{
 			scene: 'age',
 			age: '55+',
-			kicker: 'Rising action · Age',
 			title: 'People 55+ feel the most connected',
 			text: ['People 55+ feel the most connected: 58% strong and 34% weak.']
 		},
 		{
 			scene: 'mh',
 			selected: 'Poor',
-			kicker: 'Rising action · Belonging and mental health',
 			title: 'Belonging and mental health go together',
 			findings: [
 				'The better people rate their mental health, the more likely they are to feel a strong sense of belonging: 67% of those with excellent mental health, compared with 18% of those with poor mental health.',
@@ -64,7 +60,6 @@
 		{
 			scene: 'services',
 			selected: 'Very frequently',
-			kicker: 'Community services and belonging',
 			title: 'People who use community services feel they belong more',
 			findings: [
 				'The more often people use community centres and programs, the stronger their sense of belonging: from 42% among people who never use them to 70% among very frequent users.',
@@ -170,8 +165,7 @@
 		{#each steps as s, i (i)}
 			<div class="step" class:is-active={i === active} data-step={i}>
 				<div class="card" class:hook={!!s.hook}>
-					<div class="card-top">
-						<p class="kicker mono">{s.kicker}</p>
+					<div class="card-top corner">
 						<span class="step-no mono">{String(i + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}</span>
 					</div>
 					{#if s.hook}
@@ -204,6 +198,18 @@
 </section>
 
 <style>
+	/* Step number sits in the card's top-right corner so the title starts at the top */
+	.card-top.corner {
+		position: absolute;
+		top: 1.3rem;
+		right: 1.5rem;
+	}
+	.step .card {
+		padding-top: 1.3rem;
+	}
+	.card h3 {
+		padding-right: 3.5rem;
+	}
 	.scene-label {
 		margin: 0;
 		display: flex;

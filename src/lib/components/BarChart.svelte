@@ -75,10 +75,6 @@
 	{/if}
 
 	<footer>
-		<span>
-			{ageLabel} · weighted n = {question.base[age].toLocaleString()}
-			(unweighted {question.unweightedBase[age].toLocaleString()})
-		</span>
 		<span>Don't know / no answer: {noAnswer.toFixed(0)}%</span>
 		{#if comparing}
 			<span class="legend"><span class="marker-key"></span>All ages</span>
