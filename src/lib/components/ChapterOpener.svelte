@@ -10,9 +10,10 @@
 	 * `data-chapter` lets the progress HUD know which chapter the reader is in.
 	 * `hook` (optional) is shown instead of the deck as a big statement whose words get highlighted
 	 * one after another once the opener is in view.
-	 * @type {{ number: string, title: string, deck?: string, hook?: string }}
+	 * `highlight` picks which hook words get the yellow highlighter (see WordReveal).
+	 * @type {{ number: string, title: string, deck?: string, hook?: string, highlight?: 'all' | 'last-line' | 'none' }}
 	 */
-	let { number, title, deck = '', hook = '' } = $props();
+	let { number, title, deck = '', hook = '', highlight = 'last-line' } = $props();
 
 	const reveal = new Tween(0, { duration: 2400, easing: cubicInOut });
 
@@ -46,7 +47,7 @@
 		<path pathLength="1" d="M4 15 C 30 4, 52 22, 80 12 S 130 4, 156 14 S 200 18, 216 8" />
 	</svg>
 	{#if hook}
-		<p class="deck hook"><WordReveal text={hook} progress={reveal.current} start={0} end={1} highlight="last-line" /></p>
+		<p class="deck hook"><WordReveal text={hook} progress={reveal.current} start={0} end={1} {highlight} /></p>
 	{:else}
 		<p class="deck">{deck}</p>
 	{/if}

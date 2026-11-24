@@ -4,8 +4,9 @@
 	 * Unlit words are faint pencil; lit words turn to ink with a yellow highlighter stroke sweeping behind them.
 	 * The full sentence is always in the DOM, so screen readers and search read it normally.
 	 * A newline (\n) in `text` forces a line break there.
+	 * `highlight="none"` just turns words to ink with no highlighter.
 	 * `highlight="last-line"` keeps the yellow highlighter for the last line only (the rest just turns to ink).
-	 * @type {{ text: string, progress: number, start?: number, end?: number, highlight?: 'all' | 'last-line' }}
+	 * @type {{ text: string, progress: number, start?: number, end?: number, highlight?: 'all' | 'last-line' | 'none' }}
 	 */
 	let { text, progress, start = 0.05, end = 0.55, highlight = 'all' } = $props();
 
@@ -20,7 +21,7 @@
 					.map((w, wi, ws) => ({
 						w,
 						br: wi === ws.length - 1 && li < lines.length - 1,
-						hl: highlight === 'all' || li === lines.length - 1
+						hl: highlight === 'all' || (highlight === 'last-line' && li === lines.length - 1)
 					}))
 			)
 	);

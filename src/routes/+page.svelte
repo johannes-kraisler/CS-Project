@@ -2,6 +2,7 @@
 	import Backdrop from '#lib/components/Backdrop.svelte';
 	import Story from '#lib/components/Story.svelte';
 	import StudentStory from '#lib/components/StudentStory.svelte';
+	import ClassroomBackdrop from '#lib/components/ClassroomBackdrop.svelte';
 	import ChapterOpener from '#lib/components/ChapterOpener.svelte';
 	import Hud from '#lib/components/Hud.svelte';
 	import belongingByServices from '#lib/data/belonging-by-services.json';
@@ -104,11 +105,16 @@
 
 	<Story {data} {palettes} {mhPoints} {servicePoints} />
 
-	<ChapterOpener
-		number="02"
-		title="Our students"
-		deck="We asked 25 undergrads the same kinds of questions, and where they go to feel connected."
-	/>
+	<!-- Chapter 02 opener over a faint classroom sketch (full-bleed, like the city one) -->
+	<div class="students-ch">
+		<div class="students-bg" aria-hidden="true"><ClassroomBackdrop /></div>
+		<ChapterOpener
+			number="02"
+			title="Our students"
+			hook={"We asked 25 undergrads\nthe same kinds of questions,\nand where they go\nto feel connected."}
+			highlight="none"
+		/>
+	</div>
 
 	<StudentStory />
 
@@ -361,6 +367,20 @@
 		max-width: 80rem;
 		margin: 0 auto;
 		padding: 0 1rem;
+	}
+	.students-ch {
+		position: relative;
+	}
+	/* Spans the full window width even though <main> is narrower */
+	.students-bg {
+		position: absolute;
+		inset: 0 calc(50% - 50vw);
+		overflow: hidden;
+		pointer-events: none;
+	}
+	/* The full-bleed sketch must not cause sideways scrolling */
+	:global(body) {
+		overflow-x: clip;
 	}
 	main {
 		max-width: 80rem;
