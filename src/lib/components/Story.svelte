@@ -64,10 +64,7 @@
 			selected: 'Very frequently',
 			title: 'People who use community services feel they belong more',
 			findings: [
-				'The more often people use community centres and programs, the stronger their sense of belonging.',
-				'Among very frequent users, 24% feel very strongly connected, twice the city average (12%).',
-				'The correlation is clear across groups but weak for individuals (ρ = 0.19): many people feel connected without using services, and some users still feel isolated.',
-				'Community spaces may build connection, but people who already feel connected may also be more likely to show up.'
+				'The more often people use community centres and programs, the stronger their sense of belonging.'
 			]
 		}
 	];
@@ -209,6 +206,7 @@
 						points={lineStep.scene === 'mh' ? mhPoints : servicePoints}
 						selected={lineStep.selected}
 						heading={lineStep.scene === 'mh' ? mhHeading : serviceHeading}
+						xLabel={lineStep.scene === 'mh' ? 'Self-rated mental health' : 'Use of community services in the past 12 months'}
 					/>
 				</div>
 			</div>

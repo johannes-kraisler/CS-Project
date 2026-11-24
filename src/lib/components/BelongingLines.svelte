@@ -22,7 +22,8 @@
 	 *   yTicks?: number[],
 	 *   nouns?: [string, string],
 	 *   lineLabels?: [string, string],
-	 *   phrases?: [string, string]
+	 *   phrases?: [string, string],
+	 *   xLabel?: string
 	 * }}
 	 */
 	let {
@@ -42,7 +43,9 @@
 		nouns = ['person', 'people'],
 		lineLabels = ['Strong belonging', 'Weak belonging'],
 		// Used in the summary sentence after "feel" (strong first, weak second).
-		phrases = ['a strong sense of belonging', 'a weak sense of belonging']
+		phrases = ['a strong sense of belonging', 'a weak sense of belonging'],
+		// Optional title under the category axis
+		xLabel = ''
 	} = $props();
 
 	/** @param {number} n */
@@ -50,6 +53,7 @@
 
 	const W = 760;
 	const H = 380;
+	const X_LABEL_SPACE = 30; // extra room below the chart when there's an axis title
 	const pad = { top: 60, right: 130, bottom: 52, left: 48 };
 	const innerW = W - pad.left - pad.right;
 	const innerH = H - pad.top - pad.bottom;
@@ -81,9 +85,10 @@
 	let last = $derived(shownPoints.length - 1);
 
 	// While the old contents fade out, keep showing what was there before the swap.
-	let held = $state.raw(untrack(() => ({ title, heading, label: selected })));
+	let held = $state.raw(untrack(() => ({ title, heading, xLabel, label: selected })));
 	let shownTitle = $derived(swapping ? held.title : title);
 	let shownHeading = $derived(swapping ? held.heading : heading);
+	let shownXLabel = $derived(swapping ? held.xLabel : xLabel);
 	let selLabel = $derived(swapping ? held.label : selected);
 
 	let sel = $derived(shownPoints.find((p) => p.label === selLabel) ?? shownPoints[last]);
@@ -113,7 +118,7 @@
 	let drawn = $state(false); // lines draw themselves the first time the chart is seen
 
 	$effect(() => {
-		if (!swapping) held = { title, heading, label: sel.label };
+		if (!swapping) held = { title, heading, xLabel, label: sel.label };
 	});
 
 	$effect(() => {
@@ -166,7 +171,7 @@
 
 	<div class="plot">
 		<svg
-			viewBox="0 0 {W} {H}"
+			viewBox="0 0 {W} {H + (xLabel ? X_LABEL_SPACE : 0)}"
 			role="img"
 			aria-label="{shownTitle}. {shownPoints
 				.map((p) => `${shownHeading(p.label)}: ${p.strong.toFixed(0)}% strong belonging, ${p.weak.toFixed(0)}% weak belonging`)
@@ -188,6 +193,10 @@
 				<text class="xl" class:hl={p.label === selLabel} x={cx(i)} y={H - pad.bottom + 22} text-anchor="middle">{p.label}</text>
 				<text class="tick count" x={cx(i)} y={H - pad.bottom + 40} text-anchor="middle">{count(p.n)}</text>
 			{/each}
+
+			{#if shownXLabel}
+				<text class="axis-title" x={pad.left + innerW / 2} y={H + 14} text-anchor="middle">{shownXLabel}</text>
+			{/if}
 
 			{#each lines as l (l.key)}
 				{@const other = l.key === 'strong' ? lines[1].values : lines[0].values}
@@ -298,6 +307,7 @@
 	h2,
 	.xl,
 	.count,
+	.axis-title,
 	.summary-head,
 	.sbar-val,
 	.summary-text {
@@ -306,6 +316,7 @@
 	.chart.leaving h2,
 	.chart.leaving .xl,
 	.chart.leaving .count,
+	.chart.leaving .axis-title,
 	.chart.leaving .band-g,
 	.chart.leaving .line,
 	.chart.leaving .pt,
@@ -389,6 +400,12 @@
 	.xl {
 		fill: var(--fg);
 		font-size: 14px;
+	}
+	.axis-title {
+		fill: var(--muted);
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: 0.03em;
 	}
 	.xl.hl {
 		font-weight: 600;
