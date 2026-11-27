@@ -168,13 +168,8 @@
 		{
 			scene: 'hours',
 			kicker: 'Our survey · Time spent and belonging',
-			title: 'Spending time builds connection',
-			findings: [
-				'Students who spend more than 8 hours a week at their favourite place: 83% feel strongly connected (5 of 6).',
-				'Students who go rarely (less than 3 hours a week): only 22% feel strongly connected and 44% weakly, the only group where weak outnumbers strong.',
-				'The same pattern as the City data, where strong belonging rises from 42% among people who never use community services to 70% among very frequent users.',
-				'Spending time may build connection.'
-			]
+			title: 'Spending time at third spaces builds connection',
+			findings: ['The more time spent at third spaces, students reported stronger belonging']
 		},
 		{
 			scene: 'map',
@@ -344,7 +339,7 @@
 						compact
 						title={lineScene === 'lines'
 							? 'Belonging and mental health: our students'
-							: 'Time spent at favourite place and belonging'}
+							: 'Time spent at favourite Third Space and belonging'}
 						intro=""
 						pickerLegend=""
 						points={lineScene === 'lines' ? mhPoints : hoursPoints}
@@ -357,7 +352,8 @@
 						nouns={['student', 'students']}
 						lineLabels={['Strongly connected', 'Weakly connected']}
 						phrases={['strongly connected', 'weakly connected']}
-						xLabel={lineScene === 'lines' ? 'Self-rated mental health' : 'Time spent at favourite place each week'}
+						xLabel={lineScene === 'lines' ? 'Self-rated mental health' : 'Time spent at favourite Third Space each week'}
+						namedBand={lineScene === 'hours'}
 						you={lineScene === 'lines' && you?.mentalHealth && you.connection != null
 							? { label: you.mentalHealth, connection: you.connection }
 							: null}

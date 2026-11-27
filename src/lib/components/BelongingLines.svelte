@@ -24,7 +24,8 @@
 	 *   lineLabels?: [string, string],
 	 *   phrases?: [string, string],
 	 *   xLabel?: string,
-	 *   you?: { label: string, connection: number } | null
+	 *   you?: { label: string, connection: number } | null,
+	 *   namedBand?: boolean
 	 * }}
 	 */
 	let {
@@ -49,7 +50,9 @@
 		xLabel = '',
 		// The reader's own answer (from the quiz): a "you are here" arrow at their category,
 		// on the strong line (4–5), the weak line (1–2) or between them (3)
-		you = null
+		you = null,
+		// Band subtitle names the bigger group ("feel weakly connected") instead of "feel weak than strong"
+		namedBand = false
 	} = $props();
 
 	/** @param {number} n */
@@ -116,7 +119,8 @@
 		}
 		const ratio = hi / lo;
 		const r = ratio.toFixed(1).replace(/\.0$/, '');
-		return { kind: 'ratio', big: `${r}× more`, small: `feel ${more} than ${less}`, weakMore, more, less, hi, ratio };
+		const small = namedBand ? `feel ${weakMore ? phrases[1] : phrases[0]}` : `feel ${more} than ${less}`;
+		return { kind: 'ratio', big: `${r}× more`, small, weakMore, more, less, hi, ratio };
 	};
 	let cmp = $derived(comparison(sel));
 
