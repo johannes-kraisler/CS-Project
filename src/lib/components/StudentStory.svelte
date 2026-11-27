@@ -382,7 +382,7 @@
 		small
 		lower
 		highlight="marked"
-		text={"Mental health and belonging [[go hand in hand]],\nand belonging [[needs a place to grow]].\nWithout third spaces, many people's\nmental health could be in trouble."}
+		text={"Mental health and belonging go hand in hand,\nand belonging needs a place to grow.\n[[Without third spaces, many people's\nmental health could be in trouble.]]"}
 	/>
 
 	<section class="story" aria-label="Future actions">
