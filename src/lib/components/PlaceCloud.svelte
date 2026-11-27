@@ -1,7 +1,7 @@
 <script>
 	import { hierarchy, pack } from 'd3';
 	import { inview } from '#lib/inview.js';
-	import { placeStyle } from '#lib/survey0.js';
+	import { NOT_THIRD, placeStyle } from '#lib/survey0.js';
 
 	/**
 	 * Bubble "word cloud" of favourite-place categories (column "What type of place is this? (1)").
@@ -130,7 +130,6 @@
 <figure class="chart" class:popped use:inview={() => (popped = true)}>
 	<figcaption>
 		<h2>Where students like to socialize</h2>
-		<p class="col">Column: “{column}”. Bubble size = number of students who named that type of place.</p>
 	</figcaption>
 
 	<div class="cloud">
@@ -155,7 +154,7 @@
 						}
 					}}
 				>
-					<circle r={b.r} style:--c={b.color} />
+					<circle r={b.r} style:--c={b.color} class:not-third={b.category === NOT_THIRD} />
 					{#each lines(b.name) as line, li (li)}
 						<text
 							class="word"
@@ -195,20 +194,19 @@
 <style>
 	.you path {
 		fill: none;
-		stroke: var(--oi-vermillion);
+		stroke: var(--oi-yellow);
 		stroke-width: 3;
 		stroke-linecap: round;
 		stroke-linejoin: round;
 	}
 	.you text {
-		fill: var(--oi-vermillion);
+		fill: var(--oi-yellow);
 		font: 700 20px var(--font-display);
-		paint-order: stroke;
-		stroke: var(--surface);
-		stroke-width: 5px;
 	}
 	.you {
 		pointer-events: none;
+		/* Page yellow (stars, highlighter) with a thin ink outline so it reads on the paper */
+		filter: drop-shadow(1px 0 0 var(--ink)) drop-shadow(-1px 0 0 var(--ink)) drop-shadow(0 1px 0 var(--ink)) drop-shadow(0 -1px 0 var(--ink));
 		animation: you-pop 500ms var(--ease-out) 600ms backwards;
 	}
 	@keyframes you-pop {
@@ -230,12 +228,6 @@
 	h2 {
 		margin: 0;
 		font: 600 1.15rem/1.2 var(--font-display);
-	}
-	.col {
-		margin: 0.3rem 0 0;
-		font-size: 0.75rem;
-		color: var(--muted);
-		line-height: 1.4;
 	}
 	.cloud svg {
 		display: block;
@@ -268,6 +260,11 @@
 		stroke-width: 2;
 		filter: url(#sketch);
 		transition: fill 200ms ease;
+	}
+	/* Places that aren't third spaces: grey with a dashed outline, so they read as "the rest" */
+	.bubble circle.not-third {
+		stroke-dasharray: 7 5;
+		stroke-width: 1.5;
 	}
 	.bubble:hover circle,
 	.bubble.sel circle {

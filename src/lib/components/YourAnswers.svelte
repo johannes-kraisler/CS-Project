@@ -1,5 +1,5 @@
 <script>
-	import { MENTAL, PLACE_TYPES } from '#lib/survey0.js';
+	import { MENTAL, NOT_THIRD, PLACE_TYPES } from '#lib/survey0.js';
 
 	/**
 	 * "Add yourself" quiz before the Chapter 02 charts. The reader answers three of the survey's
@@ -20,16 +20,12 @@
 		{ value: 4, label: 'Quite connected' },
 		{ value: 5, label: 'Very connected' }
 	];
-	// Same short names as the bubbles in the favourite-places chart
-	/** @type {Record<string, string>} */
-	const SHORT = {
-		'Campus space (lounge, study space)': 'Campus space',
-		'Gym or recreation centre': 'Gym or rec centre',
-		'Park or outdoor space': 'Park or outdoors',
-		'Club, cultural or community group': 'Club or community group',
-		'Religious or spiritual space': 'Religious space'
-	};
-	const placeOptions = PLACE_TYPES.map((t) => ({ value: t, label: SHORT[t] ?? t }));
+	// Same groups as the bubbles in the favourite-places chart; anything that isn't a third space
+	// (home, library, school or work) goes in one last option
+	const placeOptions = PLACE_TYPES.map((t) => ({
+		value: t,
+		label: t === NOT_THIRD ? 'Somewhere else (home, library, school…)' : t
+	}));
 
 	/** @type {string | null} */
 	let mentalHealth = $state(null);

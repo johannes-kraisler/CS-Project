@@ -11,10 +11,10 @@
 	 * over a faint full-width Toronto sketch with two yellow crayon stars (like the title page).
 	 * It rises in, the stars draw themselves, and the words get highlighted once it is in view.
 	 * A newline (\n) in `text` forces a line break; `highlight` works as in WordReveal.
-	 * `small` uses slightly smaller lettering, for longer statements.
-	 * @type {{ text: string, highlight?: 'all' | 'last-line' | 'none', small?: boolean }}
+	 * `small` uses slightly smaller lettering, for longer statements; `lower` sits the text a bit lower.
+	 * @type {{ text: string, highlight?: 'all' | 'last-line' | 'none' | 'marked', small?: boolean, lower?: boolean }}
 	 */
-	let { text, highlight = 'last-line', small = false } = $props();
+	let { text, highlight = 'last-line', small = false, lower = false } = $props();
 
 	const reveal = new Tween(0, { duration: 2000, easing: cubicInOut });
 
@@ -39,7 +39,7 @@
 	});
 </script>
 
-<section class="interlude" class:visible bind:this={el}>
+<section class="interlude" class:visible class:lower bind:this={el}>
 	<div class="bg" aria-hidden="true"><Backdrop /></div>
 
 	<svg class="doodle star-big" viewBox="0 0 100 100" aria-hidden="true">
@@ -61,6 +61,9 @@
 		place-items: center;
 		padding: 0 0 6rem;
 		margin-top: -12vh; /* sit a little closer to the bar charts above */
+	}
+	.interlude.lower {
+		padding-top: 9rem;
 	}
 	/* Faint city sketch spanning the full window width, like the chapter openers */
 	.bg {

@@ -71,7 +71,15 @@
 			return { ...r, px, py };
 		})
 	);
-	let selected = $derived(points.find((p) => p.id === selectedId) ?? null);
+	// Legend filter: click place types to show only those dots (several can be on; none = all)
+	/** @type {string[]} */
+	let shownTypes = $state([]);
+	const isShown = (/** @type {{ placeType: string | null }} */ p) =>
+		!shownTypes.length || shownTypes.includes(p.placeType ?? '');
+	const toggleType = (/** @type {string} */ t) =>
+		(shownTypes = shownTypes.includes(t) ? shownTypes.filter((x) => x !== t) : [...shownTypes, t]);
+	let shownCount = $derived(points.filter(isShown).length);
+	let selected = $derived(points.find((p) => p.id === selectedId && isShown(p)) ?? null);
 	let campusXY = $derived(projection(CAMPUS) ?? [0, 0]);
 
 	/** @param {number} factor */
@@ -156,14 +164,14 @@
 				</g>
 
 				{#each points as p (p.id)}
-					<g transform="translate({p.px},{p.py}) scale({1 / k})">
+					<g transform="translate({p.px},{p.py}) scale({1 / k})" class="pin" class:hidden={!isShown(p)} aria-hidden={!isShown(p)}>
 						<circle
 							class="dot"
 							class:sel={p.id === selectedId}
 							r={p.id === selectedId ? 9 : 6.5}
 							fill={colorOf(p.placeType)}
 							role="button"
-							tabindex="0"
+							tabindex={isShown(p) ? 0 : -1}
 							aria-label="{p.placeName || 'Unnamed place'}, {p.placeType ? placeStyle(p.placeType).name : 'type not given'}, connection {p.connection ?? 'unknown'} out of 5"
 							onclick={() => (selectedId = p.id === selectedId ? null : p.id)}
 							onkeydown={(e) => {
@@ -173,7 +181,7 @@
 								}
 							}}
 						><title>{p.placeName}</title></circle>
-						{#if p.id === selectedId}
+						{#if p.id === selectedId && isShown(p)}
 							<text class="dot-label" y="-14" text-anchor="middle">{p.placeName}</text>
 						{/if}
 					</g>
@@ -186,12 +194,29 @@
 	</div>
 
 	<div class="below">
-		<ul class="legend">
+		<ul class="legend" aria-label="Show only these types of place">
 			{#each legend as g (g.id)}
-				<li><span class="swatch" style:background={g.color}></span>{g.name}</li>
+				{@const on = shownTypes.includes(g.id)}
+				<li>
+					<button
+						type="button"
+						class:on
+						class:off={shownTypes.length > 0 && !on}
+						aria-pressed={on}
+						onclick={() => toggleType(g.id)}
+						title={on ? 'Click to stop showing only this type' : `Show only ${g.name}`}
+					>
+						<span class="swatch" style:background={g.color}></span>{g.name}
+					</button>
+				</li>
 			{/each}
+			{#if shownTypes.length}
+				<li><button type="button" class="all" onclick={() => (shownTypes = [])}>Show all ×</button></li>
+			{/if}
 		</ul>
-		<p class="count">{points.length} of {total} students' places shown{points.length !== total ? ' (filtered)' : ''}</p>
+		<p class="count">
+			{shownCount} of {total} students' places shown{shownCount !== total ? ' (filtered)' : ''} · click a type to show only those places
+		</p>
 	</div>
 
 	<div class="detail" aria-live="polite">
@@ -337,8 +362,50 @@
 	}
 	.legend li {
 		display: inline-flex;
+	}
+	.legend button {
+		display: inline-flex;
 		align-items: center;
 		gap: 0.35rem;
+		padding: 0.2rem 0.55rem;
+		border: 1.5px solid transparent;
+		border-radius: 999px;
+		background: none;
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+		transition:
+			opacity 200ms ease,
+			background 200ms ease,
+			border-color 200ms ease;
+	}
+	.legend button:hover {
+		border-color: var(--line);
+	}
+	.legend button.on {
+		border-color: var(--ink);
+		background: color-mix(in srgb, var(--oi-yellow) 40%, var(--surface));
+		color: var(--ink);
+		font-weight: 700;
+	}
+	.legend button.off {
+		opacity: 0.45;
+	}
+	.legend button.all {
+		border-color: var(--line);
+		color: var(--ink);
+	}
+	.legend button:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 1px;
+	}
+	/* Dots of types not picked in the legend fade away */
+	.pin {
+		transition: opacity 250ms ease;
+	}
+	.pin.hidden {
+		opacity: 0;
+		pointer-events: none;
 	}
 	.swatch {
 		width: 0.7rem;

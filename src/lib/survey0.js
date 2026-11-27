@@ -4,8 +4,9 @@
  * Rules:
  * - Columns whose label contains "(2)" are ignored for now.
  * - Multi-select answers ("4,5_-_Very_connected") keep only the first value.
- * - "Other - What type of place is this?" free text is ignored; those answers become "Other",
- *   then "Other" answers are recoded from the place name where it clearly fits (OTHER_RECODE).
+ * - "Other - What type of place is this?" free text is ignored. Place types are grouped into
+ *   third spaces (cafés, bars, parks, gyms, clubs, ...) and "Not a third space" (home, school or
+ *   work, library), using the place name where it decides it (TYPE_GROUP, NAME_GROUP).
  * - x / y are the longitude / latitude of the place named in the "(1)" columns.
  * - Coded categories (Less_than_3, 36_or_greater, ...) are turned into readable labels,
  *   in the order implied by the column title.
@@ -52,47 +53,80 @@ const PLACE_TYPE = {
 	other: 'Other'
 };
 
+/** Group for every place that is not a third space (home, school or work, library, no place). */
+export const NOT_THIRD = 'Not a third space';
+
 /**
- * "Other" place types recoded from the place name (lower-cased, trimmed) into an existing
- * category or a new one. Names not listed here stay "Other".
+ * Third-space groups. A third space (Oldenburg) is a place outside home (the first place) and
+ * school or work (the second) where people go to socialize and connect with their community,
+ * not to study or work: cafés, bars, parks, gyms, clubs, places of worship, student lounges.
+ * Each survey place type maps to a group; places named below override that.
+ */
+const TYPE_GROUP = {
+	'Campus space (lounge, study space)': 'Campus social space',
+	'Café or restaurant': 'Pub, bar, café',
+	'Club, cultural or community group': 'Club or community group',
+	'Gym or recreation centre': 'Gym or rec centre',
+	Library: NOT_THIRD, // a place to study
+	'Park or outdoor space': 'Park or outdoors',
+	'Religious or spiritual space': 'Religious space',
+	Other: NOT_THIRD
+};
+/**
+ * Recoding by place name (lower-cased, trimmed), for "Other" answers and for places whose ticked
+ * type doesn't fit the name.
  * @type {Record<string, string>}
  */
-const OTHER_RECODE = {
-	no: 'Club, cultural or community group',
-	school: 'Campus space (lounge, study space)',
-	'madison pub': 'Pub or bar',
-	'the bar': 'Pub or bar',
-	'my house': "Home or friend's home",
-	'friends houses': "Home or friend's home",
-	'friends’ place': "Home or friend's home",
-	"friends' place": "Home or friend's home",
-	'world of warcraft': 'Online gaming'
+const NAME_GROUP = {
+	cafe: 'Pub, bar, café', // was ticked as "Library"
+	'madison pub': 'Pub, bar, café',
+	'the bar': 'Pub, bar, café',
+	'friends houses': "Friend's place",
+	'friends’ place': "Friend's place",
+	"friends' place": "Friend's place",
+	'cool events': 'Events',
+	'world of warcraft': 'Online gaming', // online games as "virtual third places"
+	// Not third spaces: the student's own home, school buildings, no place at all
+	home: NOT_THIRD,
+	'my house': NOT_THIRD,
+	school: NOT_THIRD,
+	'bahen centre of information of technology': NOT_THIRD, // academic building
+	no: NOT_THIRD // said they have no such place
 };
-/** All place-type categories in display order (existing survey options, then the recoded ones). */
+/** Place names shortened for display (lower-cased original → new name). @type {Record<string, string>} */
+const NAME_SHORT = {
+	'not exactly, but i just go to cool events when i get the chance, there so much opportunities around': 'Cool events'
+};
+/** All place groups in display order: third spaces first, then everything else. */
 export const PLACE_TYPES = [
-	...Object.values(PLACE_TYPE).filter((t) => t !== 'Other'),
-	'Pub or bar',
-	"Home or friend's home",
+	'Campus social space',
+	'Pub, bar, café',
+	"Friend's place",
+	'Gym or rec centre',
+	'Park or outdoors',
+	'Club or community group',
+	'Religious space',
+	'Events',
 	'Online gaming',
-	'Other'
+	NOT_THIRD
 ];
 /**
- * Short display name and colour for each place type, shared by the word cloud and the map so the
- * two always match. Okabe-Ito colours; there are more categories than colours, so a few share one
- * (every bubble and legend entry is labelled, so colour is never the only cue).
+ * Display name and colour for each group, shared by the word cloud and the map so the two always
+ * match. One Okabe-Ito colour per third-space group; everything else is grey.
  */
 export const PLACE_STYLE = {
-	'Campus space (lounge, study space)': { name: 'Campus space', color: 'var(--oi-blue)' },
-	'Gym or recreation centre': { name: 'Gym or rec centre', color: 'var(--oi-green)' },
-	'Park or outdoor space': { name: 'Park or outdoors', color: 'var(--oi-sky)' },
-	'Club, cultural or community group': { name: 'Club or community group', color: 'var(--oi-orange)' },
-	Library: { name: 'Library', color: 'var(--oi-purple)' },
-	'Religious or spiritual space': { name: 'Religious space', color: 'var(--oi-yellow)' },
-	'Café or restaurant': { name: 'Café or restaurant', color: 'var(--oi-vermillion)' },
-	'Pub or bar': { name: 'Pub or bar', color: 'var(--oi-vermillion)' },
-	"Home or friend's home": { name: "Home or friend's home", color: 'var(--oi-black)' },
+	'Campus social space': { name: 'Campus social space', color: 'var(--oi-blue)' },
+	'Pub, bar, café': { name: 'Pub, bar, café', color: 'var(--oi-vermillion)' },
+	"Friend's place": { name: "Friend's place", color: 'var(--oi-black)' },
+	// No ninth Okabe-Ito colour left, so a dark brown that stays distinct from the rest
+	Events: { name: 'Events', color: 'color-mix(in srgb, var(--oi-vermillion) 45%, var(--oi-black))' },
+	'Gym or rec centre': { name: 'Gym or rec centre', color: 'var(--oi-green)' },
+	'Park or outdoors': { name: 'Park or outdoors', color: 'var(--oi-sky)' },
+	'Club or community group': { name: 'Club or community group', color: 'var(--oi-orange)' },
+	'Religious space': { name: 'Religious space', color: 'var(--oi-yellow)' },
 	'Online gaming': { name: 'Online gaming', color: 'var(--oi-purple)' },
-	Other: { name: 'Other', color: 'var(--muted)' }
+	// Light grey, so it reads as "the rest" and never looks like the black café dots
+	[NOT_THIRD]: { name: NOT_THIRD, color: 'color-mix(in srgb, var(--muted) 45%, var(--surface))' }
 };
 /** @param {string} c */
 export const placeStyle = (c) => PLACE_STYLE[/** @type {keyof typeof PLACE_STYLE} */ (c)] ?? { name: c, color: 'var(--accent)' };
@@ -128,9 +162,12 @@ export function cleanRow(raw) {
 		return v === '' ? null : (map[v] ?? v.replace(/_/g, ' '));
 	};
 	const conn = first(r[COLUMNS.connection]).match(/^\d/);
-	const placeName = (r[COLUMNS.placeName] ?? '').trim();
-	let placeType = pick(PLACE_TYPE, COLUMNS.placeType);
-	if (placeType === 'Other') placeType = OTHER_RECODE[placeName.toLowerCase()] ?? 'Other';
+	const rawName = (r[COLUMNS.placeName] ?? '').trim();
+	// Long free-text answers shortened for display
+	const placeName = NAME_SHORT[rawName.toLowerCase()] ?? rawName;
+	const ticked = pick(PLACE_TYPE, COLUMNS.placeType);
+	// Group into third spaces vs not: the place name wins over the ticked type when listed
+	const placeType = ticked == null && !placeName ? null : (NAME_GROUP[placeName.toLowerCase()] ?? TYPE_GROUP[/** @type {keyof typeof TYPE_GROUP} */ (ticked)] ?? NOT_THIRD);
 	return {
 		id: +r[COLUMNS.id],
 		loneliness: num(COLUMNS.loneliness),

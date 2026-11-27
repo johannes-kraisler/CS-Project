@@ -129,6 +129,11 @@
 			> (weighted data tables). Percentages are of all respondents in the selected group, including
 			those who answered "Don't know" or chose not to answer.
 		</p>
+		<p>
+			Source: our own survey of 25 undergraduate students at the University of Toronto, conducted on
+			November 4, 2026. Chapter 02 percentages are unweighted shares of the students who answered each
+			question, so treat them as signals rather than firm numbers.
+		</p>
 	</footer>
 </main>
 

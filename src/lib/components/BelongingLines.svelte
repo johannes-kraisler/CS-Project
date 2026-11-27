@@ -304,21 +304,20 @@
 <style>
 	.you {
 		pointer-events: none;
+		/* Page yellow (stars, highlighter) with a thin ink outline so it reads on the paper */
+		filter: drop-shadow(1px 0 0 var(--ink)) drop-shadow(-1px 0 0 var(--ink)) drop-shadow(0 1px 0 var(--ink)) drop-shadow(0 -1px 0 var(--ink));
 		animation: you-in 500ms var(--ease-out) 400ms backwards;
 	}
 	.you path {
 		fill: none;
-		stroke: var(--oi-vermillion);
+		stroke: var(--oi-yellow);
 		stroke-width: 3;
 		stroke-linecap: round;
 		stroke-linejoin: round;
 	}
 	.you text {
-		fill: var(--oi-vermillion);
+		fill: var(--oi-yellow);
 		font: 700 20px var(--font-display);
-		paint-order: stroke;
-		stroke: var(--surface);
-		stroke-width: 5px;
 	}
 	@keyframes you-in {
 		from {

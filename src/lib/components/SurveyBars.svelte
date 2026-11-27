@@ -5,7 +5,7 @@
 	 * the subset filtered by every *other* view), so the view recomputes when filters change.
 	 * Clicking a bar toggles a filter on this view's value.
 	 * @type {{
-	 *   view: { field: string, title: string, column: string, categories: (string|number)[], label?: (v: any) => string },
+	 *   view: { field: string, title: string, column: string, question?: string, categories: (string|number)[], label?: (v: any) => string },
 	 *   rows: Record<string, any>[],
 	 *   total: number,
 	 *   selected?: string | number | null,
@@ -36,8 +36,8 @@
 <figure class="chart" use:inview={() => (ready = true)}>
 	<figcaption>
 		<h2>{view.title}</h2>
-		<!-- The survey question, without the CSV's "(1)" suffix -->
-		<p class="col">{view.column.replace(/\s*\(\d\)\s*$/, '')}</p>
+		<!-- The survey question: custom wording if given, else the CSV column without its "(1)" suffix -->
+		<p class="col">{view.question ?? view.column.replace(/\s*\(\d\)\s*$/, '')}</p>
 	</figcaption>
 
 	<ul class="bars">
@@ -163,7 +163,9 @@
 	}
 	.you {
 		position: absolute;
-		color: var(--oi-vermillion);
+		/* Page yellow (stars, highlighter) with a thin ink outline so it reads on the paper */
+		color: var(--oi-yellow);
+		filter: drop-shadow(1px 0 0 var(--ink)) drop-shadow(-1px 0 0 var(--ink)) drop-shadow(0 1px 0 var(--ink)) drop-shadow(0 -1px 0 var(--ink));
 		font: 700 0.9rem / 1.2 var(--font-display);
 		white-space: nowrap;
 		pointer-events: none;

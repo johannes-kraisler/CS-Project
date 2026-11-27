@@ -6,25 +6,35 @@
 	 * A newline (\n) in `text` forces a line break there.
 	 * `highlight="none"` just turns words to ink with no highlighter.
 	 * `highlight="last-line"` keeps the yellow highlighter for the last line only (the rest just turns to ink).
-	 * @type {{ text: string, progress: number, start?: number, end?: number, highlight?: 'all' | 'last-line' | 'none' }}
+	 * `highlight="marked"` highlights only the phrases wrapped in [[double brackets]] in `text`.
+	 * @type {{ text: string, progress: number, start?: number, end?: number, highlight?: 'all' | 'last-line' | 'none' | 'marked' }}
 	 */
 	let { text, progress, start = 0.05, end = 0.55, highlight = 'all' } = $props();
 
 	// Each word remembers whether a forced line break (\n) comes right after it.
-	let words = $derived(
-		text
-			.split(/\n/)
-			.flatMap((line, li, lines) =>
-				line
-					.trim()
-					.split(/\s+/)
-					.map((w, wi, ws) => ({
-						w,
+	let words = $derived.by(() => {
+		let inMark = false; // inside a [[marked phrase]] (can span words and lines)
+		return text.split(/\n/).flatMap((line, li, lines) =>
+			line
+				.trim()
+				.split(/\s+/)
+				.map((raw, wi, ws) => {
+					const opens = raw.includes('[[');
+					const closes = raw.includes(']]');
+					const marked = inMark || opens;
+					if (opens) inMark = true;
+					if (closes) inMark = false;
+					return {
+						w: raw.replace(/\[\[|\]\]/g, ''),
 						br: wi === ws.length - 1 && li < lines.length - 1,
-						hl: highlight === 'all' || (highlight === 'last-line' && li === lines.length - 1)
-					}))
-			)
-	);
+						hl:
+							highlight === 'all' ||
+							(highlight === 'last-line' && li === lines.length - 1) ||
+							(highlight === 'marked' && marked)
+					};
+				})
+		);
+	});
 	let t = $derived(Math.min(1, Math.max(0, (progress - start) / (end - start))));
 	let lit = $derived(t * words.length);
 </script>

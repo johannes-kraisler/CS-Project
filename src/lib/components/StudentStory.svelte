@@ -9,7 +9,8 @@
 	import PlacesMap from '#lib/components/PlacesMap.svelte';
 	import PlaceCloud from '#lib/components/PlaceCloud.svelte';
 	import YourAnswers from '#lib/components/YourAnswers.svelte';
-	import { cleanRow, COLUMNS, VIEWS } from '#lib/survey0.js';
+	import Interlude from '#lib/components/Interlude.svelte';
+	import { cleanRow, COLUMNS, NOT_THIRD, VIEWS } from '#lib/survey0.js';
 
 	/**
 	 * Storyboard for our own survey of undergrad students (static/survey_0.csv).
@@ -46,6 +47,8 @@
 	const belongingView = {
 		...VIEWS.find((v) => v.field === 'connection'),
 		title: 'Sense of belonging',
+		// Wording shown under the chart title (the CSV column itself is unchanged)
+		question: 'How connected do you feel to the people in your surroundings?',
 		categories: [5, 4, 3, 2, 1] // best to worst, like the mental health chart
 	};
 	const views = /** @type {const} */ ([mentalHealthView, belongingView]);
@@ -100,24 +103,12 @@
 	});
 	let hoursSelected = $state('Very frequently');
 
-	// Step 4 evidence. Student figures are computed from survey_0.csv (all 25 students);
-	// City figures come from the Toronto Community Survey tables used in the first story.
+	// Share of students whose favourite place is not a third space (home, school, library or
+	// nowhere), shown above the word cloud. Based on the place grouping, not the separate yes/no
+	// question, which many students answered "No" while still naming a café, park or lounge.
 	let evidence = $derived.by(() => {
-		const all = rows;
-		const strongPct = (/** @type {typeof rows} */ g) =>
-			g.length ? Math.round((g.filter((r) => (r.connection ?? 0) >= 4).length / g.length) * 100) : 0;
-		const byMh = (/** @type {string} */ m) => all.filter((r) => r.mentalHealth === m);
-		const byHours = (/** @type {string} */ h) => all.filter((r) => r.hours === h);
-		const noPlace = all.filter((r) => r.hasPlace === 'No').length;
-		return {
-			studentsExcellent: strongPct(byMh('Excellent')),
-			studentsFair: strongPct(byMh('Fair')),
-			studentsRarely: strongPct(byHours('Less than 3 hours')),
-			studentsVeryOften: strongPct(byHours('More than 8 hours')),
-			noPlace,
-			noPlacePct: all.length ? Math.round((noPlace / all.length) * 100) : 0,
-			total: all.length
-		};
+		const noPlace = rows.filter((r) => r.placeType === NOT_THIRD).length;
+		return { noPlace, noPlacePct: rows.length ? Math.round((noPlace / rows.length) * 100) : 0, total: rows.length };
 	});
 
 	let filteredCount = $derived(subset(null).length);
@@ -154,7 +145,7 @@
 		};
 	});
 
-	/** @type {{ scene: 'bars' | 'lines' | 'hours' | 'message' | 'map' | 'cloud', kicker: string, title?: string, message?: string, text?: string[], findings?: string[] }[]} */
+	/** @type {{ scene: 'bars' | 'lines' | 'hours' | 'map' | 'cloud', kicker: string, title?: string, message?: string, text?: string[], findings?: string[] }[]} */
 	const steps = [
 		{
 			scene: 'bars',
@@ -164,7 +155,7 @@
 			get findings() {
 				return [
 					`Only ${shares.mhHigh}% of students rate their mental health as excellent or very good. ${shares.mhLow}% say fair or poor.`,
-					`${shares.strong}% feel strongly connected; ${shares.weak}% feel weakly connected.`
+					`${shares.strong}% feel very or quite connected; ${shares.weak}% feel weakly connected.`
 				];
 			}
 		},
@@ -172,11 +163,7 @@
 			scene: 'lines',
 			kicker: 'Our survey · Belonging and mental health',
 			title: 'Students show the same trend as Torontonians',
-			findings: [
-				'Students who rate their mental health excellent: 67% feel strongly connected and none weakly, the same 67% as Torontonians with excellent mental health.',
-				'Students with fair mental health: 67% feel weakly connected and only 17% strongly (City: 63% weak).',
-				'Students rating their mental health "good" still mostly feel connected (60% strong), so the switch comes at "fair", one step later than in the City data.'
-			]
+			findings: ['Strong mental health reports strong connection, while negative mental health trends toward weak connection.']
 		},
 		{
 			scene: 'hours',
@@ -198,19 +185,16 @@
 			]
 		},
 		{
-			scene: 'message',
-			kicker: 'Main insight',
-			message:
-				"Mental health and belonging go hand in hand, and belonging needs a place to grow. Without third spaces, many people's mental health could be in trouble."
-		},
-		{
 			scene: 'cloud',
 			kicker: 'Future actions',
 			title: 'Encourage people to socialize!',
-			text: [
-				'This story keeps finding the same two links. Belonging goes with mental health: 67% of Torontonians and of our students with excellent mental health feel strongly connected, compared with 18% of Torontonians with poor mental health and 17% of students with fair mental health. And belonging grows where people spend time together: strong belonging rises from 42% to 70% among Torontonians who use community services more often, and from 22% to 83% among students who spend more hours at their favourite place. Yet 44% of the students we asked have no regular place to socialize outside home, school and work.',
-				'That makes third spaces worth investing in: free or low-cost places, open when people are free, where they can keep coming back. The word cloud shows where students already find connection, and it can serve as a starting list: campus lounges and dining halls, gyms and recreation centres, parks, clubs and community groups, libraries, and informal spots such as pubs, friends\' homes and even online games. More of these, closer to where people live and study, gives belonging a place to grow.'
-			]
+			// Kept live, so the share without a third space includes the reader's quiz answer
+			get text() {
+				return [
+				`This story keeps finding the same two links. Belonging goes with mental health: 67% of Torontonians and of our students with excellent mental health feel strongly connected, compared with 18% of Torontonians with poor mental health and 17% of students with fair mental health. And belonging grows where people spend time together: strong belonging rises from 42% to 70% among Torontonians who use community services more often, and from 22% to 83% among students who spend more hours at their favourite place. Yet ${evidence.noPlacePct}% of the students we asked have no third space: their favourite place to socialize is home, school, a library, or nowhere at all.`,
+				'That makes third spaces worth investing in: free or low-cost places, open when people are free, where they can keep coming back. The word cloud shows where students already find connection, and it can serve as a starting list: campus lounges and dining halls, cafés, gyms and recreation centres, parks, clubs and community groups, places of worship, and informal spots such as pubs and even online games. More of these, closer to where people live and study, gives belonging a place to grow.'
+				];
+			}
 		}
 	];
 
@@ -226,7 +210,6 @@
 	const sections = {
 		bars: group('bars'),
 		lines: group('lines', 'hours'),
-		message: group('message'),
 		map: group('map'),
 		cloud: group('cloud')
 	};
@@ -398,65 +381,26 @@
 		</div>
 		{@render cards(sections.map)}
 	</section>
-	<section class="story" aria-label="Main insight">
-		<div class="graphic">
-			<div class="stage">
-				<div class="scene">
-					<div class="evidence" class:seen={evidenceSeen} use:inview={() => (evidenceSeen = true)}>
-						<section class="ev-group">
-							<h2>Mental health and belonging go hand in hand</h2>
-							<div class="tiles">
-								<div class="tile">
-									<p class="big"><span class="bad"><CountUp value={evidenceSeen ? 18 : 0} />%</span> vs <span class="good"><CountUp value={evidenceSeen ? 67 : 0} />%</span></p>
-									<p class="what">of Torontonians with poor vs excellent mental health feel a strong sense of belonging</p>
-									<p class="src">City survey · 7,222 residents</p>
-								</div>
-								<div class="tile">
-									<p class="big">
-										<span class="bad"><CountUp value={evidenceSeen ? evidence.studentsFair : 0} />%</span> vs <span class="good"><CountUp value={evidenceSeen ? evidence.studentsExcellent : 0} />%</span>
-									</p>
-									<p class="what">of students with fair vs excellent mental health feel strongly connected</p>
-									<p class="src">Our survey · {evidence.total} students</p>
-								</div>
-							</div>
-						</section>
-						<section class="ev-group">
-							<h2>Belonging needs a place to grow</h2>
-							<div class="tiles">
-								<div class="tile">
-									<p class="big"><span class="bad"><CountUp value={evidenceSeen ? 42 : 0} />%</span> → <span class="good"><CountUp value={evidenceSeen ? 70 : 0} />%</span></p>
-									<p class="what">strong belonging among Torontonians who never vs very frequently use community services</p>
-									<p class="src">City survey · 7,222 residents</p>
-								</div>
-								<div class="tile">
-									<p class="big">
-										<span class="bad"><CountUp value={evidenceSeen ? evidence.studentsRarely : 0} />%</span> → <span class="good"><CountUp value={evidenceSeen ? evidence.studentsVeryOften : 0} />%</span>
-									</p>
-									<p class="what">
-										of students strongly connected when they spend under 3 vs over 8 hours a week at their favourite place
-									</p>
-									<p class="src">Our survey · {evidence.total} students</p>
-								</div>
-								<div class="tile wide">
-									<p class="big"><span class="bad"><CountUp value={evidenceSeen ? evidence.noPlacePct : 0} />%</span></p>
-									<p class="what">
-										of students ({evidence.noPlace} of {evidence.total}) have no regular place to socialize outside home,
-										school and work
-									</p>
-									<p class="src">Our survey · column “Do you have a place you regularly go to socialize, outside of home, school, and work?”</p>
-								</div>
-							</div>
-						</section>
-					</div>
-				</div>
-			</div>
-		</div>
-		{@render cards(sections.message)}
-	</section>
+	<!-- Main insight as a full-screen statement, in the same style as the chapter 01 questions -->
+	<Interlude
+		small
+		lower
+		highlight="marked"
+		text={"Mental health and belonging [[go hand in hand]],\nand belonging [[needs a place to grow]].\nWithout third spaces, many people's\nmental health could be in trouble."}
+	/>
+
 	<section class="story" aria-label="Future actions">
 		<div class="graphic">
 			<div class="stage">
 				<div class="scene">
+					<!-- The one figure kept from the old "main insight" page -->
+					<div class="tile" class:seen={evidenceSeen} use:inview={() => (evidenceSeen = true)}>
+						<p class="big"><span class="bad"><CountUp value={evidenceSeen ? evidence.noPlacePct : 0} />%</span></p>
+						<p class="what">
+							of students ({evidence.noPlace} of {evidence.total}) have no third space: their favourite place to socialize
+							is home, school, a library, or nowhere at all
+						</p>
+					</div>
 					<PlaceCloud rows={subset(null)} total={rows.length} column={COLUMNS.placeType} />
 				</div>
 			</div>
@@ -478,57 +422,21 @@
 			align-self: start;
 		}
 	}
-	.evidence {
-		display: grid;
-		gap: 1.5rem;
-	}
-	.ev-group {
-		display: grid;
-		gap: 0.7rem;
-	}
-	.ev-group h2 {
-		margin: 0;
-		font: 700 clamp(1.8rem, 2.6vw, 2.2rem) / 1.05 var(--font-display);
-	}
-	.tiles {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.75rem;
-	}
-	@media (max-width: 560px) {
-		.tiles {
-			grid-template-columns: 1fr;
-		}
-	}
+	/* "Have no third space" figure above the word cloud: number left, words right */
 	.tile {
-		display: grid;
-		align-content: start;
-		gap: 0.4rem;
-		padding: 1.1rem 1.2rem;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.8rem 1.2rem;
 		background: var(--surface);
 		border: 2px solid var(--ink);
 		border-radius: var(--wobble);
 		box-shadow: var(--shadow);
 		opacity: 0;
 	}
-	.seen .tile {
+	.tile.seen {
 		opacity: 1;
 		animation: tile-in 700ms var(--ease-out) backwards;
-	}
-	.seen .tile:nth-child(2) {
-		animation-delay: 120ms;
-	}
-	.seen .tile:nth-child(3) {
-		animation-delay: 240ms;
-	}
-	.seen .ev-group + .ev-group .tile {
-		animation-delay: 300ms;
-	}
-	.seen .ev-group + .ev-group .tile:nth-child(2) {
-		animation-delay: 420ms;
-	}
-	.seen .ev-group + .ev-group .tile:nth-child(3) {
-		animation-delay: 540ms;
 	}
 	@keyframes tile-in {
 		from {
@@ -536,18 +444,11 @@
 			transform: translateY(20px) scale(0.97);
 		}
 	}
-	.tile.wide {
-		grid-column: 1 / -1;
-	}
 	.tile p {
 		margin: 0;
 	}
 	.big {
 		font: 700 clamp(2.6rem, 5vw, 3.6rem) / 0.95 var(--font-display);
-		color: var(--muted);
-	}
-	.big .good {
-		color: var(--good-2);
 	}
 	.big .bad {
 		color: var(--bad-2);
@@ -555,11 +456,6 @@
 	.what {
 		font-size: 1rem;
 		line-height: 1.4;
-	}
-	.src {
-		font-family: var(--font-mono);
-		font-size: 0.85rem;
-		color: var(--muted);
 	}
 	.para {
 		font-size: 0.92rem;
