@@ -23,7 +23,8 @@
 	 *   nouns?: [string, string],
 	 *   lineLabels?: [string, string],
 	 *   phrases?: [string, string],
-	 *   xLabel?: string
+	 *   xLabel?: string,
+	 *   you?: { label: string, connection: number } | null
 	 * }}
 	 */
 	let {
@@ -45,7 +46,10 @@
 		// Used in the summary sentence after "feel" (strong first, weak second).
 		phrases = ['a strong sense of belonging', 'a weak sense of belonging'],
 		// Optional title under the category axis
-		xLabel = ''
+		xLabel = '',
+		// The reader's own answer (from the quiz): a "you are here" arrow at their category,
+		// on the strong line (4–5), the weak line (1–2) or between them (3)
+		you = null
 	} = $props();
 
 	/** @param {number} n */
@@ -115,6 +119,15 @@
 		return { kind: 'ratio', big: `${r}× more`, small: `feel ${more} than ${less}`, weakMore, more, less, hi, ratio };
 	};
 	let cmp = $derived(comparison(sel));
+
+	let youMark = $derived.by(() => {
+		if (!you || swapping) return null;
+		const i = shownPoints.findIndex((p) => p.label === you.label);
+		if (i < 0) return null;
+		const p = shownPoints[i];
+		const v = you.connection >= 4 ? p.strong : you.connection <= 2 ? p.weak : (p.strong + p.weak) / 2;
+		return { x: cx(i), y: y(v), left: i > last / 2 };
+	});
 	let drawn = $state(false); // lines draw themselves the first time the chart is seen
 
 	$effect(() => {
@@ -221,6 +234,19 @@
 				<text class="end" style:--d="1500ms" x={cx(last) + 22} y={y(l.values[last])} dominant-baseline="middle" fill={l.color}>{l.label}</text>
 			{/each}
 
+			{#if youMark}
+				<!-- "You are here": label up and to the side, arrow curving down to the point -->
+				<g class="you" transform="translate({youMark.x},{youMark.y})" aria-hidden="true">
+					{#if youMark.left}
+						<path d="M-58 -30 C -44 -28, -26 -18, -13 -4 M-13 -4 L -25 -6 M-13 -4 L -16 -16" />
+						<text x="-62" y="-34" text-anchor="end">you are here</text>
+					{:else}
+						<path d="M58 -30 C 44 -28, 26 -18, 13 -4 M13 -4 L 25 -6 M13 -4 L 16 -16" />
+						<text x="62" y="-34">you are here</text>
+					{/if}
+				</g>
+			{/if}
+
 			<!-- Click a rating on the chart to select it (the buttons above are the keyboard-accessible control) -->
 			{#each shownPoints as p, i (p.label)}
 				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
@@ -276,6 +302,29 @@
 </figure>
 
 <style>
+	.you {
+		pointer-events: none;
+		animation: you-in 500ms var(--ease-out) 400ms backwards;
+	}
+	.you path {
+		fill: none;
+		stroke: var(--oi-vermillion);
+		stroke-width: 3;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+	.you text {
+		fill: var(--oi-vermillion);
+		font: 700 20px var(--font-display);
+		paint-order: stroke;
+		stroke: var(--surface);
+		stroke-width: 5px;
+	}
+	@keyframes you-in {
+		from {
+			opacity: 0;
+		}
+	}
 	.chart {
 		margin: 0;
 		display: grid;

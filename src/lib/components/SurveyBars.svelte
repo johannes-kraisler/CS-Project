@@ -10,10 +10,12 @@
 	 *   total: number,
 	 *   selected?: string | number | null,
 	 *   colors?: string[],
-	 *   onselect?: (value: string | number) => void
+	 *   onselect?: (value: string | number) => void,
+	 *   youPlacement?: 'left' | 'below'
 	 * }}
 	 */
-	let { view, rows, total, selected = null, colors = [], onselect } = $props();
+	// Where the "you are here" tag goes: in the gap left of the bar, or under it with a diagonal arrow
+	let { view, rows, total, selected = null, colors = [], onselect, youPlacement = 'below' } = $props();
 
 	let counts = $derived(
 		view.categories.map((c, i) => ({
@@ -27,17 +29,20 @@
 	let max = $derived(Math.max(1, ...counts.map((c) => c.count)));
 	let filtered = $derived(rows.length !== total);
 	let ready = $state(false); // bars grow in from 0 the first time the chart is seen
+	// The reader's own answer (added from the quiz as the row with id -1), marked "you are here".
+	let youValue = $derived(rows.find((r) => r.id === -1)?.[view.field] ?? null);
 </script>
 
 <figure class="chart" use:inview={() => (ready = true)}>
 	<figcaption>
 		<h2>{view.title}</h2>
-		<p class="col">Column: “{view.column}”</p>
+		<!-- The survey question, without the CSV's "(1)" suffix -->
+		<p class="col">{view.column.replace(/\s*\(\d\)\s*$/, '')}</p>
 	</figcaption>
 
 	<ul class="bars">
 		{#each counts as c, i (c.value)}
-			<li style:--i={i}>
+			<li style:--i={i} class:is-you={youValue === c.value && youPlacement === 'below'}>
 				<button
 					type="button"
 					class:active={selected === c.value}
@@ -49,6 +54,25 @@
 					<span class="label">{c.label}</span>
 					<span class="track">
 						<span class="bar" style:width="{ready ? (c.count / max) * 100 : 0}%" style:background-color={c.color}></span>
+						{#if youValue === c.value}
+							{#if youPlacement === 'left'}
+								<!-- In the gap between the label and the bar, pointing right at the bar -->
+								<span class="you left">
+									you are here
+									<svg viewBox="0 0 30 16" aria-hidden="true">
+										<path d="M2 10 C 9 4, 17 12, 27 7 M27 7 L 19 2 M27 7 L 21 14" />
+									</svg>
+								</span>
+							{:else}
+								<!-- Under the bar, a little to the left, with a diagonal arrow up to the bar -->
+								<span class="you below">
+									you are here
+									<svg viewBox="0 0 26 20" aria-hidden="true">
+										<path d="M2 18 C 8 16, 16 10, 23 3 M23 3 L 13 4 M23 3 L 21 12" />
+									</svg>
+								</span>
+							{/if}
+						{/if}
 					</span>
 					<span class="value">
 						{c.count}
@@ -127,10 +151,63 @@
 		font-size: 0.85rem;
 	}
 	.track {
+		position: relative;
 		height: 1.1rem;
 		background: var(--track);
 		border-radius: 4px;
-		overflow: hidden;
+	}
+	/* "You are here" tag in the theme red, on a paper chip so it reads over a bar too */
+	/* The reader's row gets extra room underneath for the tag */
+	.is-you button {
+		padding-bottom: 1.45rem;
+	}
+	.you {
+		position: absolute;
+		color: var(--oi-vermillion);
+		font: 700 0.9rem / 1.2 var(--font-display);
+		white-space: nowrap;
+		pointer-events: none;
+		animation: you-in 500ms var(--ease-out) 300ms backwards;
+	}
+	.you.left {
+		right: calc(100% + 0.3rem);
+		top: 50%;
+		translate: 0 -50%;
+		display: flex;
+		align-items: center;
+		gap: 0.15rem;
+	}
+	.you.left svg {
+		width: 1.7rem;
+		height: 0.95rem;
+		overflow: visible;
+	}
+	/* The arrow tip lands just inside the start of the bar */
+	.you.below {
+		right: calc(100% - 0.7rem);
+		top: calc(100% - 2px);
+		display: flex;
+		align-items: flex-start;
+		gap: 0.1rem;
+		padding-top: 0.55rem;
+	}
+	.you.below svg {
+		width: 1.5rem;
+		height: 1.15rem;
+		margin-top: -0.55rem;
+		overflow: visible;
+	}
+	.you svg path {
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2.4;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+	@keyframes you-in {
+		from {
+			opacity: 0;
+		}
 	}
 	.bar {
 		display: block;

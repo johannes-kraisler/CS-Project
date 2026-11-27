@@ -46,13 +46,14 @@
 	const mentalHealthView = VIEWS.find((v) => v.field === 'mentalHealth');
 	const belongingView = {
 		...VIEWS.find((v) => v.field === 'connection'),
-		title: 'Sense of belonging'
+		title: 'Sense of belonging',
+		categories: [5, 4, 3, 2, 1] // best to worst, like the mental health chart
 	};
 	const views = /** @type {const} */ ([mentalHealthView, belongingView]);
 
 	const palettes = {
 		mentalHealth: ['var(--good-2)', 'var(--good-1)', 'var(--mid)', 'var(--bad-1)', 'var(--bad-2)'],
-		connection: ['var(--bad-2)', 'var(--bad-1)', 'var(--mid)', 'var(--good-1)', 'var(--good-2)']
+		connection: ['var(--good-2)', 'var(--good-1)', 'var(--mid)', 'var(--bad-1)', 'var(--bad-2)']
 	};
 
 	/** @type {Record<string, string | number>} */
@@ -140,16 +141,33 @@
 		return `${name}: ${v?.label ? v.label(value) : value}`;
 	};
 
+	// Headline shares for the first card (of students who answered each question)
+	let shares = $derived.by(() => {
+		const mh = rows.filter((r) => r.mentalHealth != null);
+		const conn = rows.filter((r) => r.connection != null);
+		const pct = (/** @type {number} */ k, /** @type {number} */ n) => (n ? Math.round((k / n) * 100) : 0);
+		const mhIn = (/** @type {string[]} */ v) => mh.filter((r) => v.includes(/** @type {string} */ (r.mentalHealth))).length;
+		return {
+			mhHigh: pct(mhIn(['Excellent', 'Very good']), mh.length),
+			mhLow: pct(mhIn(['Fair', 'Poor']), mh.length),
+			strong: pct(conn.filter((r) => /** @type {number} */ (r.connection) >= 4).length, conn.length),
+			weak: pct(conn.filter((r) => /** @type {number} */ (r.connection) <= 2).length, conn.length)
+		};
+	});
+
 	/** @type {{ scene: 'bars' | 'lines' | 'hours' | 'message' | 'map' | 'cloud', kicker: string, title?: string, message?: string, text?: string[], findings?: string[] }[]} */
 	const steps = [
 		{
 			scene: 'bars',
 			kicker: 'Our survey',
 			title: 'Only a third of students rate their mental health highly',
-			findings: [
-				'Only 32% of students rate their mental health as excellent or very good. 28% say fair or poor.',
-				'48% feel strongly connected; 28% feel weakly connected.'
-			]
+			// Computed live, so the figures include the reader once they add their answers
+			get findings() {
+				return [
+					`Only ${shares.mhHigh}% of students rate their mental health as excellent or very good. ${shares.mhLow}% say fair or poor.`,
+					`${shares.strong}% feel strongly connected; ${shares.weak}% feel weakly connected.`
+				];
+			}
 		},
 		{
 			scene: 'lines',
@@ -330,6 +348,7 @@
 								selected={filters[view.field] ?? null}
 								colors={palettes[/** @type {'mentalHealth' | 'connection'} */ (view.field)]}
 								onselect={(v) => toggle(view.field, v)}
+								youPlacement={view?.field === 'mentalHealth' ? 'left' : 'below'}
 							/>
 						{/each}
 					</div>
@@ -361,6 +380,9 @@
 						nouns={['student', 'students']}
 						lineLabels={['Strongly connected', 'Weakly connected']}
 						phrases={['strongly connected', 'weakly connected']}
+						you={lineScene === 'lines' && you?.mentalHealth && you.connection != null
+							? { label: you.mentalHealth, connection: you.connection }
+							: null}
 						heading={lineScene === 'lines'
 							? (label) => `Students with ${label.toLowerCase()} mental health`
 							: (label) =>
