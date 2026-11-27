@@ -40,7 +40,7 @@ const HOURS = {
 	Greater_than_8: 'More than 8 hours'
 };
 const AGE = { '18-25': '18–25', '26-35': '26–35', '36_or_greater': '36 or older' };
-const MENTAL = { Excellent: 'Excellent', Very_good: 'Very good', Good: 'Good', Fair: 'Fair', Poor: 'Poor' };
+export const MENTAL = { Excellent: 'Excellent', Very_good: 'Very good', Good: 'Good', Fair: 'Fair', Poor: 'Poor' };
 const PLACE_TYPE = {
 	'Campus_space_(lounge_study_spac': 'Campus space (lounge, study space)',
 	'Café_or_restaurant': 'Café or restaurant',
@@ -69,7 +69,7 @@ const OTHER_RECODE = {
 	'world of warcraft': 'Online gaming'
 };
 /** All place-type categories in display order (existing survey options, then the recoded ones). */
-const PLACE_TYPES = [
+export const PLACE_TYPES = [
 	...Object.values(PLACE_TYPE).filter((t) => t !== 'Other'),
 	'Pub or bar',
 	"Home or friend's home",

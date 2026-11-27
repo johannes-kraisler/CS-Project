@@ -2,18 +2,21 @@
 	import { inview } from '#lib/inview.js';
 
 	/**
-	 * Full-screen definition slide: a pencil-sketch portrait taped to the page like a photo, next
+	 * Full-screen definition slide: a portrait photo taped to the page, next
 	 * to a hand-lettered definition of third spaces. Both rise in when the slide scrolls into view.
 	 */
 	let visible = $state(false);
 </script>
 
 <section class="slide" class:visible use:inview={() => (visible = true)}>
+	<!-- First, second and third place illustration, faded into the paper behind the slide -->
+	<div class="bg" aria-hidden="true"></div>
+
 	<figure class="who">
 		<div class="photo">
 			<span class="tape tape-l" aria-hidden="true"></span>
 			<span class="tape tape-r" aria-hidden="true"></span>
-			<img src="/portrait-sketch.png" alt="Pencil sketch of Ray Oldenburg holding his glasses, in front of bookshelves" width="700" height="986" loading="lazy" />
+			<img src="/ray-oldenburg.jpg" alt="Ray Oldenburg holding his glasses, in front of bookshelves" width="700" height="986" loading="lazy" />
 		</div>
 		<!-- Hand-drawn arrow from the name up to the photo -->
 		<svg class="arrow" viewBox="0 0 120 90" aria-hidden="true">
@@ -30,13 +33,33 @@
 
 <style>
 	.slide {
+		position: relative;
 		min-height: 100vh;
 		min-height: 100svh;
 		display: grid;
-		grid-template-columns: minmax(14rem, 26rem) minmax(0, 1fr);
+		grid-template-columns: minmax(14rem, 26rem) minmax(0, 36rem);
+		justify-content: center; /* photo + text sit as one group in the middle of the page */
 		align-items: center;
 		gap: clamp(2rem, 6vw, 5rem);
 		padding: 4rem 0;
+	}
+
+	/* Full window width; white parts of the picture melt into the paper (multiply) */
+	.bg {
+		position: absolute;
+		inset: 0 calc(50% - 50vw);
+		background: url('/three-places.jpg') center / contain no-repeat;
+		mix-blend-mode: multiply;
+		/* Nearly clear behind the definition text so it reads cleanly, full strength elsewhere */
+		--fade: radial-gradient(ellipse 26% 32% at 65% 50%, rgb(0 0 0 / 0.12) 55%, #000 100%);
+		-webkit-mask-image: var(--fade);
+		mask-image: var(--fade);
+		opacity: 0;
+		transition: opacity 1200ms var(--ease-out);
+		pointer-events: none;
+	}
+	.visible .bg {
+		opacity: 0.3;
 	}
 
 	.who {
@@ -50,7 +73,8 @@
 		bottom: -5rem;
 		rotate: -3deg;
 		font: 400 clamp(1.7rem, 2.6vw, 2.3rem) / 1.1 var(--font-display);
-		color: var(--ink);
+		/* Theme purple, a touch deeper so the name stays readable on the paper */
+		color: color-mix(in srgb, var(--accent) 80%, var(--ink));
 		white-space: nowrap;
 		opacity: 0;
 		transition: opacity 700ms var(--ease-out) 1400ms;
@@ -67,7 +91,7 @@
 	}
 	.arrow path {
 		fill: none;
-		stroke: var(--ink);
+		stroke: var(--oi-vermillion); /* theme red, like the red spiral on the title page */
 		stroke-width: 4;
 		stroke-linecap: round;
 		stroke-linejoin: round;
@@ -122,6 +146,7 @@
 	}
 
 	.definition {
+		position: relative; /* above the background picture */
 		margin: 0;
 		max-width: 22ch;
 		font: 700 clamp(2.2rem, 4.2vw, 3.8rem) / 1.1 var(--font-display);
@@ -162,6 +187,10 @@
 		}
 		.who {
 			width: min(13rem, 60vw);
+		}
+		.bg {
+			/* text sits below the photo on phones */
+			--fade: radial-gradient(ellipse 60% 22% at 50% 76%, rgb(0 0 0 / 0.12) 55%, #000 100%);
 		}
 		.name {
 			right: -2rem;

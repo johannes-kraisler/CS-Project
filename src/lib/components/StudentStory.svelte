@@ -9,6 +9,7 @@
 	import BelongingLines from '#lib/components/BelongingLines.svelte';
 	import PlacesMap from '#lib/components/PlacesMap.svelte';
 	import PlaceCloud from '#lib/components/PlaceCloud.svelte';
+	import YourAnswers from '#lib/components/YourAnswers.svelte';
 	import { cleanRow, COLUMNS, VIEWS } from '#lib/survey0.js';
 
 	/**
@@ -18,7 +19,28 @@
 	 */
 
 	/** @type {import('#lib/survey0.js').Response[]} */
-	let rows = $state([]);
+	let surveyRows = $state([]);
+	// The reader's own answers from the quiz, added as one extra student. Kept in memory only,
+	// so they vanish on refresh.
+	/** @type {import('#lib/survey0.js').Response | null} */
+	let you = $state(null);
+	let rows = $derived(you ? [...surveyRows, you] : surveyRows);
+	/** @param {{ mentalHealth: string, connection: number, placeType: string } | null} a */
+	const setYou = (a) =>
+		(you = a && {
+			id: -1,
+			loneliness: null,
+			placeName: 'You',
+			hours: null,
+			created: null,
+			age: null,
+			mentalHealth: a.mentalHealth,
+			hasPlace: 'Yes',
+			connection: a.connection,
+			placeType: a.placeType,
+			x: null,
+			y: null
+		});
 	let error = $state('');
 
 	const mentalHealthView = VIEWS.find((v) => v.field === 'mentalHealth');
@@ -206,7 +228,7 @@
 
 	onMount(() => {
 		csv('/survey_0.csv', cleanRow)
-			.then((d) => (rows = d))
+			.then((d) => (surveyRows = d))
 			.catch((e) => (error = `Couldn't load survey_0.csv: ${e.message}`));
 
 		/** @type {any} */
@@ -278,6 +300,8 @@
 {/snippet}
 
 <div bind:this={rootEl} role="region" aria-label="Story: our survey of undergrad students">
+	<YourAnswers onchange={setYou} total={rows.length} />
+
 	<section class="story" aria-label="Our survey: mental health and belonging">
 		<div class="graphic">
 			<div class="stage">
