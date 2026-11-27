@@ -1,6 +1,5 @@
 <script>
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
 	import { inview } from '#lib/inview.js';
 	import WordReveal from '#lib/components/WordReveal.svelte';
 	import CountUp from '#lib/components/CountUp.svelte';
@@ -172,24 +171,30 @@
 		{
 			scene: 'lines',
 			kicker: 'Our survey · Belonging and mental health',
-			title: 'Students show the same link as the city',
+			title: 'Students show the same trend as Torontonians',
 			findings: [
 				'Students who rate their mental health excellent: 67% feel strongly connected and none weakly, the same 67% as Torontonians with excellent mental health.',
 				'Students with fair mental health: 67% feel weakly connected and only 17% strongly (City: 63% weak).',
-				'Students rating their mental health "good" still mostly feel connected (60% strong), so the switch comes at "fair", one step later than in the City data.',
-				'Very good (2 students) and poor (1 student) are too small to read on their own. Click a rating on the chart to see its numbers.',
-				'Different question: students rated their connection to people at their favourite place; the City asked about belonging to their local community.'
+				'Students rating their mental health "good" still mostly feel connected (60% strong), so the switch comes at "fair", one step later than in the City data.'
 			]
 		},
 		{
 			scene: 'hours',
 			kicker: 'Our survey · Time spent and belonging',
-			title: 'The more time students spend there, the more they belong',
+			title: 'Spending time builds connection',
 			findings: [
 				'Students who spend more than 8 hours a week at their favourite place: 83% feel strongly connected (5 of 6).',
 				'Students who go rarely (less than 3 hours a week): only 22% feel strongly connected and 44% weakly, the only group where weak outnumbers strong.',
 				'The same pattern as the City data, where strong belonging rises from 42% among people who never use community services to 70% among very frequent users.',
-				'Spending time may build connection, or students who already feel connected may simply spend more time there. Groups have 4–9 students, so treat this as a signal. Click a group on the chart to see its numbers.'
+				'Spending time may build connection.'
+			]
+		},
+		{
+			scene: 'map',
+			kicker: 'Where the places are',
+			title: 'Most students find their place around campus',
+			findings: [
+				'16 of 25 favourite places (64%) are within 2 km of U of T\'s St. George campus, and 8 are in the University neighbourhood itself: Hart House, the Athletic Centre, Bahen, dining halls.'
 			]
 		},
 		{
@@ -197,17 +202,6 @@
 			kicker: 'Main insight',
 			message:
 				"Mental health and belonging go hand in hand, and belonging needs a place to grow. Without third spaces, many people's mental health could be in trouble."
-		},
-		{
-			scene: 'map',
-			kicker: 'Falling action · Where the places are',
-			title: 'Most students find their place around campus',
-			findings: [
-				'16 of 25 favourite places (64%) are within 2 km of U of T\'s St. George campus, and 8 are in the University neighbourhood itself: Hart House, the Athletic Centre, Bahen, dining halls.',
-				'The places farther away (friends\' homes, a gym, a community group) are a little more often strongly connected: 5 of 9, compared with 7 of 16 near campus.',
-				'3 places are outside Toronto\'s city limits.',
-				'Zoom in with + / −, "Zoom to campus", or Ctrl/⌘ + scroll; drag to pan; click a dot to see the place and how that student answered.'
-			]
 		},
 		{
 			scene: 'cloud',
@@ -380,6 +374,7 @@
 						nouns={['student', 'students']}
 						lineLabels={['Strongly connected', 'Weakly connected']}
 						phrases={['strongly connected', 'weakly connected']}
+						xLabel={lineScene === 'lines' ? 'Self-rated mental health' : 'Time spent at favourite place each week'}
 						you={lineScene === 'lines' && you?.mentalHealth && you.connection != null
 							? { label: you.mentalHealth, connection: you.connection }
 							: null}
@@ -388,24 +383,20 @@
 							: (label) =>
 									`Students who spend ${HOURS_GROUPS.find((h) => h.label === label)?.detail ?? label} at their favourite place`}
 					/>
-					{#key lineScene}
-						<p class="note" in:fade={{ duration: 400, delay: 320 }}>
-							{#if lineScene === 'lines'}
-								Columns: “In general, how would you rate your mental health?” and “How connected do you feel to
-								the people at this place? (1)”. Strongly connected = 4–5, weakly = 1–2 (out of 5). Click a
-								rating to see its numbers.
-							{:else}
-								Columns: “How many hours weekly do you spend here? (1)” and “How connected do you feel to the
-								people at this place? (1)”. Rarely = less than 3 hours a week, Occasionally = 3–5, Frequently =
-								5–8, Very frequently = more than 8. Strongly connected = 4–5, weakly = 1–2. Click a group to see
-								its numbers.
-							{/if}
-						</p>
-					{/key}
 				</div>
 			</div>
 		</div>
 		{@render cards(sections.lines)}
+	</section>
+	<section class="story" aria-label="Where the places are">
+		<div class="graphic">
+			<div class="stage">
+				<div class="scene">
+					<PlacesMap rows={subset(null)} total={rows.length} autoCampus />
+				</div>
+			</div>
+		</div>
+		{@render cards(sections.map)}
 	</section>
 	<section class="story" aria-label="Main insight">
 		<div class="graphic">
@@ -461,16 +452,6 @@
 			</div>
 		</div>
 		{@render cards(sections.message)}
-	</section>
-	<section class="story" aria-label="Where the places are">
-		<div class="graphic">
-			<div class="stage">
-				<div class="scene">
-					<PlacesMap rows={subset(null)} total={rows.length} autoCampus />
-				</div>
-			</div>
-		</div>
-		{@render cards(sections.map)}
 	</section>
 	<section class="story" aria-label="Future actions">
 		<div class="graphic">
@@ -586,12 +567,6 @@
 	}
 	.card.main {
 		padding-block: 1.8rem;
-	}
-	.note {
-		margin: 0;
-		font-size: 0.75rem;
-		color: var(--muted);
-		line-height: 1.45;
 	}
 	.toolbar {
 		display: flex;

@@ -76,6 +76,27 @@ export const PLACE_TYPES = [
 	'Online gaming',
 	'Other'
 ];
+/**
+ * Short display name and colour for each place type, shared by the word cloud and the map so the
+ * two always match. Okabe-Ito colours; there are more categories than colours, so a few share one
+ * (every bubble and legend entry is labelled, so colour is never the only cue).
+ */
+export const PLACE_STYLE = {
+	'Campus space (lounge, study space)': { name: 'Campus space', color: 'var(--oi-blue)' },
+	'Gym or recreation centre': { name: 'Gym or rec centre', color: 'var(--oi-green)' },
+	'Park or outdoor space': { name: 'Park or outdoors', color: 'var(--oi-sky)' },
+	'Club, cultural or community group': { name: 'Club or community group', color: 'var(--oi-orange)' },
+	Library: { name: 'Library', color: 'var(--oi-purple)' },
+	'Religious or spiritual space': { name: 'Religious space', color: 'var(--oi-yellow)' },
+	'Café or restaurant': { name: 'Café or restaurant', color: 'var(--oi-vermillion)' },
+	'Pub or bar': { name: 'Pub or bar', color: 'var(--oi-vermillion)' },
+	"Home or friend's home": { name: "Home or friend's home", color: 'var(--oi-black)' },
+	'Online gaming': { name: 'Online gaming', color: 'var(--oi-purple)' },
+	Other: { name: 'Other', color: 'var(--muted)' }
+};
+/** @param {string} c */
+export const placeStyle = (c) => PLACE_STYLE[/** @type {keyof typeof PLACE_STYLE} */ (c)] ?? { name: c, color: 'var(--accent)' };
+
 // The survey only worded the two ends of the 1–5 scale; the middle labels are ours, for readability.
 export const CONNECTION_LABELS = {
 	1: '1 – Not connected at all',

@@ -1,6 +1,7 @@
 <script>
 	import { hierarchy, pack } from 'd3';
 	import { inview } from '#lib/inview.js';
+	import { placeStyle } from '#lib/survey0.js';
 
 	/**
 	 * Bubble "word cloud" of favourite-place categories (column "What type of place is this? (1)").
@@ -19,24 +20,8 @@
 	const H = 460;
 	const MARGIN = 34;
 
-	/** Display names and colours for each category. */
-	const STYLE = {
-		// Okabe-Ito colours. There are more categories than colours, so a few share one;
-		// every bubble is labelled, so colour is never the only cue.
-		'Campus space (lounge, study space)': { name: 'Campus space', color: 'var(--oi-blue)' },
-		'Gym or recreation centre': { name: 'Gym or rec centre', color: 'var(--oi-green)' },
-		'Park or outdoor space': { name: 'Park or outdoors', color: 'var(--oi-sky)' },
-		'Club, cultural or community group': { name: 'Club or community group', color: 'var(--oi-orange)' },
-		Library: { name: 'Library', color: 'var(--oi-purple)' },
-		'Religious or spiritual space': { name: 'Religious space', color: 'var(--oi-yellow)' },
-		'Café or restaurant': { name: 'Café or restaurant', color: 'var(--oi-vermillion)' },
-		'Pub or bar': { name: 'Pub or bar', color: 'var(--oi-vermillion)' },
-		"Home or friend's home": { name: "Home or friend's home", color: 'var(--oi-black)' },
-		'Online gaming': { name: 'Online gaming', color: 'var(--oi-purple)' },
-		Other: { name: 'Other', color: 'var(--muted)' }
-	};
-	const styleOf = (/** @type {string} */ c) =>
-		STYLE[/** @type {keyof typeof STYLE} */ (c)] ?? { name: c, color: 'var(--accent)' };
+	// Display names and colours come from the shared list, so the map uses the same ones
+	const styleOf = placeStyle;
 
 	let categories = $derived.by(() => {
 		/** @type {Map<string, string[]>} */

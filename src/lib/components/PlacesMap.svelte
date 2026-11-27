@@ -3,10 +3,11 @@
 	import { geoMercator, geoPath, json, select, zoom as d3zoom, zoomIdentity } from 'd3';
 	import { inview } from '#lib/inview.js';
 	import { reducedMotion } from '#lib/motion.js';
+	import { PLACE_STYLE, placeStyle } from '#lib/survey0.js';
 
 	/**
 	 * Zoomable map of students' favourite places (x / y columns of survey_0.csv, which belong to
-	 * the "(1)" place). Dots are coloured by how connected the student feels there.
+	 * the "(1)" place). Dots are coloured by type of place, the same colours as the word cloud.
 	 * Zoom: buttons, drag to pan, Ctrl/Cmd + scroll or pinch (plain scrolling keeps scrolling the page).
 	 * @type {{
 	 *   rows: import('#lib/survey0.js').Response[],
@@ -55,14 +56,14 @@
 		(geo?.features ?? []).map((/** @type {any} */ f) => ({ name: f.properties.name, xy: path.centroid(f) }))
 	);
 
-	/** @param {number | null} c */
-	const group = (c) => (c == null ? 'none' : c >= 4 ? 'strong' : c <= 2 ? 'weak' : 'mid');
-	const GROUPS = [
-		{ id: 'strong', label: 'Strongly connected (4–5)', color: 'var(--good-2)' },
-		{ id: 'mid', label: 'In between (3)', color: 'var(--mid)' },
-		{ id: 'weak', label: 'Weakly connected (1–2)', color: 'var(--bad-2)' }
-	];
-	const colorOf = (/** @type {number | null} */ c) => GROUPS.find((g) => g.id === group(c))?.color ?? 'var(--muted)';
+	/** Dot colour = the place type's colour in the word cloud */
+	const colorOf = (/** @type {string | null} */ t) => (t ? placeStyle(t).color : 'var(--muted)');
+	// Legend: only the place types that appear on the map, in the cloud's order
+	let legend = $derived(
+		Object.keys(PLACE_STYLE)
+			.filter((t) => located.some((r) => r.placeType === t))
+			.map((t) => ({ id: t, ...placeStyle(t) }))
+	);
 
 	let points = $derived(
 		located.map((r) => {
@@ -120,7 +121,6 @@
 <figure class="chart">
 	<figcaption>
 		<h2>Where students' favourite places are</h2>
-		<p class="col">Columns: “x”, “y” (location of the favourite place) and “How connected do you feel to the people at this place? (1)”</p>
 	</figcaption>
 
 	<div class="controls">
@@ -130,7 +130,6 @@
 			<button type="button" onclick={() => toCampus()}>Zoom to campus</button>
 			<button type="button" onclick={reset}>Reset</button>
 		</div>
-		<p class="hint">Drag to pan · Ctrl/⌘ + scroll or pinch to zoom · click a dot</p>
 	</div>
 
 	<div class="map" use:inview={() => (seen = true)}>
@@ -162,10 +161,10 @@
 							class="dot"
 							class:sel={p.id === selectedId}
 							r={p.id === selectedId ? 9 : 6.5}
-							fill={colorOf(p.connection)}
+							fill={colorOf(p.placeType)}
 							role="button"
 							tabindex="0"
-							aria-label="{p.placeName || 'Unnamed place'}, connection {p.connection ?? 'unknown'} out of 5"
+							aria-label="{p.placeName || 'Unnamed place'}, {p.placeType ? placeStyle(p.placeType).name : 'type not given'}, connection {p.connection ?? 'unknown'} out of 5"
 							onclick={() => (selectedId = p.id === selectedId ? null : p.id)}
 							onkeydown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
@@ -188,8 +187,8 @@
 
 	<div class="below">
 		<ul class="legend">
-			{#each GROUPS as g (g.id)}
-				<li><span class="swatch" style:background={g.color}></span>{g.label}</li>
+			{#each legend as g (g.id)}
+				<li><span class="swatch" style:background={g.color}></span>{g.name}</li>
 			{/each}
 		</ul>
 		<p class="count">{points.length} of {total} students' places shown{points.length !== total ? ' (filtered)' : ''}</p>
@@ -225,12 +224,6 @@
 		margin: 0;
 		font: 600 1.15rem/1.2 var(--font-display);
 	}
-	.col {
-		margin: 0.3rem 0 0;
-		font-size: 0.75rem;
-		color: var(--muted);
-		line-height: 1.4;
-	}
 	.controls {
 		display: flex;
 		flex-wrap: wrap;
@@ -259,11 +252,6 @@
 	.zoom-buttons button:focus-visible {
 		outline: 2px solid var(--accent);
 		outline-offset: 2px;
-	}
-	.hint {
-		margin: 0;
-		font-size: 0.75rem;
-		color: var(--muted);
 	}
 	.map {
 		position: relative;
