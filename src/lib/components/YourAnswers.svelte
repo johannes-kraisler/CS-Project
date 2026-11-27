@@ -62,10 +62,9 @@
 <section class="quiz" aria-labelledby="quiz-title">
 	<div class="card">
 		<p class="kicker mono"><span class="hl-marker">Your turn</span></p>
-		<h2 id="quiz-title">Before the charts: how about you?</h2>
+		<h2 id="quiz-title">How about you?</h2>
 		<p class="intro">
-			Answer the same three questions we asked the students, then add yourself to the charts below. Your answers
-			stay on this page only and disappear when you refresh.
+			Answer the same three questions we asked the students.
 		</p>
 
 		<fieldset>
