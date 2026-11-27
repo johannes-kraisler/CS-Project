@@ -25,29 +25,20 @@
 	const steps = [
 		{
 			scene: 'age',
-			age: '18-24',
-			title: 'Mental health improves with age',
-			text: [
-				'Younger adults (18–34) report the worst mental health.',
-				'About a third of 18–24s say Fair or Poor (32%), and 12% say Poor, which is twice the city average.'
-			]
-		},
-		{
-			scene: 'age',
-			age: '25-34',
-			title: '25–34s feel the least connected',
-			text: [
-				'They are the only age group where most people (53%) report a weak sense of belonging.',
-				'Their mental health is almost as low as 18–24s: 31% say Fair or Poor (city average 21%), and only 38% say Excellent or Very good.'
-			]
-		},
-		{
-			scene: 'age',
 			age: '55+',
 			title: 'People 55+ feel the most connected',
 			text: [
 				'58% strong and 34% weak.',
 				'They also report the best mental health: 67% say Excellent or Very good (city average 52%), and only 12% say Fair or Poor.'
+			]
+		},
+		{
+			scene: 'age',
+			age: '18-34',
+			title: 'Younger Torontonians report worse mental health and connection',
+			text: [
+				'Only 38% of 18–34s say their mental health is Excellent or Very good (city average 52%), and 32% say Fair or Poor (city average 21%).',
+				'About half (51%) report a weak sense of belonging, compared with 43% across the city.'
 			]
 		},
 		{
