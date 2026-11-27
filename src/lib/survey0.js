@@ -5,7 +5,7 @@
  * - Columns whose label contains "(2)" are ignored for now.
  * - Multi-select answers ("4,5_-_Very_connected") keep only the first value.
  * - "Other - What type of place is this?" free text is ignored. Place types are grouped into
- *   third spaces (cafés, bars, parks, gyms, clubs, ...) and "Not a third space" (home, school or
+ *   Third Places (cafés, bars, parks, gyms, clubs, ...) and "Not a Third Place" (home, school or
  *   work, library), using the place name where it decides it (TYPE_GROUP, NAME_GROUP).
  * - x / y are the longitude / latitude of the place named in the "(1)" columns.
  * - Coded categories (Less_than_3, 36_or_greater, ...) are turned into readable labels,
@@ -53,11 +53,11 @@ const PLACE_TYPE = {
 	other: 'Other'
 };
 
-/** Group for every place that is not a third space (home, school or work, library, no place). */
-export const NOT_THIRD = 'Not a third space';
+/** Group for every place that is not a Third Place (home, school or work, library, no place). */
+export const NOT_THIRD = 'Not a Third Place';
 
 /**
- * Third-space groups. A third space (Oldenburg) is a place outside home (the first place) and
+ * Third Place groups. A Third Place (Oldenburg) is a place outside home (the first place) and
  * school or work (the second) where people go to socialize and connect with their community,
  * not to study or work: cafés, bars, parks, gyms, clubs, places of worship, student lounges.
  * Each survey place type maps to a group; places named below override that.
@@ -86,7 +86,7 @@ const NAME_GROUP = {
 	"friends' place": "Friend's place",
 	'cool events': 'Events',
 	'world of warcraft': 'Online gaming', // online games as "virtual third places"
-	// Not third spaces: the student's own home, school buildings, no place at all
+	// Not Third Places: the student's own home, school buildings, no place at all
 	home: NOT_THIRD,
 	'my house': NOT_THIRD,
 	school: NOT_THIRD,
@@ -97,7 +97,7 @@ const NAME_GROUP = {
 const NAME_SHORT = {
 	'not exactly, but i just go to cool events when i get the chance, there so much opportunities around': 'Cool events'
 };
-/** All place groups in display order: third spaces first, then everything else. */
+/** All place groups in display order: Third Places first, then everything else. */
 export const PLACE_TYPES = [
 	'Campus social space',
 	'Pub, bar, café',
@@ -112,7 +112,7 @@ export const PLACE_TYPES = [
 ];
 /**
  * Display name and colour for each group, shared by the word cloud and the map so the two always
- * match. One Okabe-Ito colour per third-space group; everything else is grey.
+ * match. One Okabe-Ito colour per Third Place group; everything else is grey.
  */
 export const PLACE_STYLE = {
 	'Campus social space': { name: 'Campus social space', color: 'var(--oi-blue)' },
@@ -166,7 +166,7 @@ export function cleanRow(raw) {
 	// Long free-text answers shortened for display
 	const placeName = NAME_SHORT[rawName.toLowerCase()] ?? rawName;
 	const ticked = pick(PLACE_TYPE, COLUMNS.placeType);
-	// Group into third spaces vs not: the place name wins over the ticked type when listed
+	// Group into Third Places vs not: the place name wins over the ticked type when listed
 	const placeType = ticked == null && !placeName ? null : (NAME_GROUP[placeName.toLowerCase()] ?? TYPE_GROUP[/** @type {keyof typeof TYPE_GROUP} */ (ticked)] ?? NOT_THIRD);
 	return {
 		id: +r[COLUMNS.id],

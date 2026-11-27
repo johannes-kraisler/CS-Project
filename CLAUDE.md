@@ -5,7 +5,7 @@ Guidance for working on this project. Read it before making changes.
 ## Project overview
 
 **Wellbeing and Belonging by Age** is a scrollytelling website about mental health, sense of
-belonging and third spaces in Toronto. It is a University of Toronto course project, built with
+belonging and Third Places in Toronto. It is a University of Toronto course project, built with
 SvelteKit (Svelte 5), D3 and scrollama, in a hand-drawn "sketchbook" style.
 
 The story has two chapters:
@@ -15,7 +15,7 @@ The story has two chapters:
    health and to the use of community services.
 2. **Chapter 02 – Our students.** Our own survey of 25 University of Toronto undergraduates
    (4 November 2026): mental health, connection, time spent at a favourite place, where those
-   places are, and which of them are third spaces.
+   places are, and which of them are Third Places.
 
 ## Running the project
 
@@ -35,7 +35,7 @@ count before and after.
 |---|---|
 | `src/routes/+page.svelte` | Page order: hero, Chapter 01 opener, `Story`, Chapter 02 opener, `StudentStory`, sources footer |
 | `src/routes/+layout.svelte` | Fonts and the shared SVG `#sketch` / `#sketch-strong` pen-wobble filters |
-| `src/lib/components/Story.svelte` | Chapter 01: steps, sticky charts, statement slides, third-spaces slide |
+| `src/lib/components/Story.svelte` | Chapter 01: steps, sticky charts, statement slides, Third Places slide |
 | `src/lib/components/StudentStory.svelte` | Chapter 02: quiz, steps, sticky charts, live figures |
 | `src/lib/components/` | Charts (`BarChart`, `SurveyBars`, `BelongingLines`, `PlacesMap`, `PlaceCloud`) and story pieces (`ChapterOpener`, `Interlude`, `ThirdSpaces`, `YourAnswers`, `WordReveal`, `Backdrop`, `ClassroomBackdrop`, `Hud`, `CountUp`) |
 | `src/lib/survey0.js` | Cleaning and grouping rules for the student survey |
@@ -60,13 +60,13 @@ count before and after.
     wrap the words to highlight in `[[double brackets]]`; a marked phrase may span line breaks.
   - Use `\n` in the text for line breaks.
 - Chapter 01 currently runs: opener → age bar charts (55+, then 18–34) → "So, how can mental
-  health be improved…" → line charts → "So, Belonging and Community Services…" → third-spaces
+  health be improved…" → line charts → "So, Belonging and Community Services…" → Third Places
   slide with Ray Oldenburg.
 - Chapter 02 currently runs: opener → "How about you?" quiz → survey bars → line charts → map →
-  "Mental health and belonging go hand in hand…" → "Without 3rd Spaces…" with the "no regular
+  "Mental health and belonging go hand in hand…" → "Without Third Places…" with the "no regular
   place to socialize" figure → word cloud.
 - `Interlude` can show extra content under its statement (pass it as children), as the
-  "Without 3rd Spaces…" slide does with its figure.
+  "Without Third Places…" slide does with its figure.
 
 ## Data rules
 
@@ -85,23 +85,23 @@ count before and after.
 - Student percentages are unweighted shares of the students who answered that question.
 - Connection is on a 1–5 scale. Strongly connected = 4–5 and weakly connected = 1–2.
 
-### Third spaces
+### Third Places
 
-A **third space** (Ray Oldenburg) is a place outside home (the first place) and school or work
+A **Third Place** (Ray Oldenburg) is a place outside home (the first place) and school or work
 (the second place) where people go to socialize and connect with their community, not to study or
 work.
 
 - Every favourite place is put into one group in `survey0.js`:
-  - Third-space groups: Campus social space; Pub, bar, café; Friend's place; Gym or rec centre;
+  - Third Place groups: Campus social space; Pub, bar, café; Friend's place; Gym or rec centre;
     Park or outdoors; Club or community group; Religious space; Events; Online gaming.
-  - Everything else goes into **Not a third space**: the student's own home, school or academic
+  - Everything else goes into **Not a Third Place**: the student's own home, school or academic
     buildings, libraries, and "no place".
 - The place **name** decides the group when it is clearer than the ticked type (`NAME_GROUP`).
   For example, "Cafe" was ticked as Library, and the Bahen Centre is an academic building.
 - Long free-text names are shortened for display (`NAME_SHORT`), e.g. "Cool events".
 - `PLACE_TYPES` and `PLACE_STYLE` are the single source of group names, order and colours. The
   word cloud, the map and the quiz must all read from them.
-- The "no regular place to socialize" figure counts the **Not a third space** group. Do not use the separate
+- The "no regular place to socialize" figure counts the **Not a Third Place** group. Do not use the separate
   yes/no question "Do you have a place you regularly go to socialize…?": many students answered
   "No" while still naming a café, park or lounge.
 
@@ -113,12 +113,12 @@ charts, the map and the word cloud always show all students (plus the reader, if
 ## The reader's answers (quiz)
 
 - `YourAnswers` asks four of the survey's questions: mental health, connection, favourite place
-  (by third-space group, or "No place") and weekly time spent there (the time-spent chart's groups). When the reader adds their answers, they become
+  (by Third Place group, or "No place") and weekly time spent there (the time-spent chart's groups). When the reader adds their answers, they become
   one extra row (`id: -1`) in Chapter 02's data.
 - The answers live in memory only. Never store them, send them anywhere, or keep them across a
   refresh.
 - Every Chapter 02 figure that depends on the data must stay live: the charts, the first card's
-  percentages, the "no regular place to socialize" figure and the closing paragraph. Use `$derived` values or
+  percentages and the "no regular place to socialize" figure. Use `$derived` values or
   getters, not hard-coded numbers.
 - Charts mark the reader's answer with a hand-drawn arrow and "you are here". The marker must
   never overlap labels, numbers, titles or other bubbles; check this with a screenshot.

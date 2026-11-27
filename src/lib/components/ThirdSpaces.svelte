@@ -3,7 +3,7 @@
 
 	/**
 	 * Full-screen definition slide: a portrait photo taped to the page, next
-	 * to a hand-lettered definition of third spaces. Both rise in when the slide scrolls into view.
+	 * to a hand-lettered definition of Third Places. Both rise in when the slide scrolls into view.
 	 */
 	let visible = $state(false);
 </script>
@@ -26,7 +26,7 @@
 	</figure>
 
 	<p class="definition">
-		<span class="term">Third spaces</span> are places outside of the home and workplace where people go to converse with
+		<span class="term">Third Places</span> are places outside of the home and workplace where people go to converse with
 		others and connect with their community.
 	</p>
 </section>
@@ -158,7 +158,7 @@
 			opacity 800ms var(--ease-out) 250ms,
 			transform 900ms var(--ease-out) 250ms;
 	}
-	/* "Third spaces" gets the yellow highlighter, swept in after the text appears */
+	/* "Third Places" gets the yellow highlighter, swept in after the text appears */
 	.term {
 		background: linear-gradient(100deg, transparent 1%, var(--oi-yellow) 3%, var(--oi-yellow) 97%, transparent 99%)
 			no-repeat 0 60% / 0% 80%;

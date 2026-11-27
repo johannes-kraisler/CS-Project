@@ -263,7 +263,7 @@
 		filter: url(#sketch);
 		transition: fill 200ms ease;
 	}
-	/* Places that aren't third spaces: grey with a dashed outline, so they read as "the rest" */
+	/* Places that aren't Third Places: grey with a dashed outline, so they read as "the rest" */
 	.bubble circle.not-third {
 		stroke-dasharray: 7 5;
 		stroke-width: 1.5;

@@ -21,7 +21,7 @@
 		{ value: 5, label: 'Very connected' }
 	];
 	// Same groups as the bubbles in the favourite-places chart, plus "No place" for readers without
-	// a third space (counted in the "Not a third space" group)
+	// a Third Place (counted in the "Not a Third Place" group)
 	const placeOptions = PLACE_TYPES.map((t) => ({
 		value: t,
 		label: t === NOT_THIRD ? 'No place' : t
@@ -111,7 +111,7 @@
 		</fieldset>
 
 		<fieldset>
-			<legend>4. How much time do you spend at your favourite third space each week?</legend>
+			<legend>4. How much time do you spend at your favourite Third Place each week?</legend>
 			<div class="options">
 				{#each hoursOptions as o (o.value)}
 					<label class="opt" class:on={hours === o.value}>

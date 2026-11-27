@@ -111,7 +111,7 @@
 		return label ? { label, connection: you.connection } : null;
 	});
 
-	// Share of students whose favourite place is not a third space (home, school, library or
+	// Share of students whose favourite place is not a Third Place (home, school, library or
 	// nowhere), shown above the word cloud. Based on the place grouping, not the separate yes/no
 	// question, which many students answered "No" while still naming a café, park or lounge.
 	let evidence = $derived.by(() => {
@@ -176,8 +176,8 @@
 		{
 			scene: 'hours',
 			kicker: 'Our survey · Time spent and belonging',
-			title: 'Spending time at third spaces builds connection',
-			findings: ['The more time spent at third spaces, students reported stronger belonging']
+			title: 'Spending time at Third Places builds connection',
+			findings: ['The more time spent at Third Places, students reported stronger belonging']
 		},
 		{
 			scene: 'map',
@@ -190,14 +190,12 @@
 		{
 			scene: 'cloud',
 			kicker: 'Future actions',
-			title: 'Encourage people to socialize!',
-			// Kept live, so the share without a third space includes the reader's quiz answer
-			get text() {
-				return [
-				`This story keeps finding the same two links. Belonging goes with mental health: 67% of Torontonians and of our students with excellent mental health feel strongly connected, compared with 18% of Torontonians with poor mental health and 17% of students with fair mental health. And belonging grows where people spend time together: strong belonging rises from 42% to 70% among Torontonians who use community services more often, and from 22% to 83% among students who spend more hours at their favourite place. Yet ${evidence.noPlacePct}% of the students we asked have no third space: their favourite place to socialize is home, school, a library, or nowhere at all.`,
-				'That makes third spaces worth investing in: free or low-cost places, open when people are free, where they can keep coming back. The word cloud shows where students already find connection, and it can serve as a starting list: campus lounges and dining halls, cafés, gyms and recreation centres, parks, clubs and community groups, places of worship, and informal spots such as pubs and even online games. More of these, closer to where people live and study, gives belonging a place to grow.'
-				];
-			}
+			title: 'Third Places are worth investing in!',
+			text: [
+				'More places of socialization, community, and belonging.',
+				'Not Home or Work, but free or low-cost places of gathering.',
+				'More of these gives belonging a place to grow.'
+			]
 		}
 	];
 
@@ -347,7 +345,7 @@
 						compact
 						title={lineScene === 'lines'
 							? 'Belonging and mental health: our students'
-							: 'Time spent at favourite Third Space and belonging'}
+							: 'Time spent at favourite Third Place and belonging'}
 						intro=""
 						pickerLegend=""
 						points={lineScene === 'lines' ? mhPoints : hoursPoints}
@@ -360,7 +358,7 @@
 						nouns={['student', 'students']}
 						lineLabels={['Strongly connected', 'Weakly connected']}
 						phrases={['strongly connected', 'weakly connected']}
-						xLabel={lineScene === 'lines' ? 'Self-rated mental health' : 'Time spent at favourite Third Space each week'}
+						xLabel={lineScene === 'lines' ? 'Self-rated mental health' : 'Time spent at favourite Third Place each week'}
 						namedBand={lineScene === 'hours'}
 						you={youLine}
 						heading={lineScene === 'lines'
@@ -391,8 +389,8 @@
 		text={"Mental health and belonging [[go hand in hand]],\nand belonging [[needs a place to grow]]"}
 	/>
 
-	<Interlude small highlight="all" text={"Without 3rd Spaces, many people's\nmental health could be in trouble…"}>
-		<!-- Live: counts the "Not a third space" group, including the reader's quiz answer -->
+	<Interlude small highlight="all" text={"Without Third Places, many people's\nmental health could be in trouble…"}>
+		<!-- Live: counts the "Not a Third Place" group, including the reader's quiz answer -->
 		<div class="tile" class:seen={evidenceSeen} use:inview={() => (evidenceSeen = true)}>
 			<p class="big"><span class="bad"><CountUp value={evidenceSeen ? evidence.noPlacePct : 0} />%</span></p>
 			<p class="what">of students reported no regular place to socialize outside of home, school, and work…</p>
