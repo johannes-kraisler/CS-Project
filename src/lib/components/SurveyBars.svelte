@@ -163,9 +163,8 @@
 	}
 	.you {
 		position: absolute;
-		/* Page yellow (stars, highlighter) with a thin ink outline so it reads on the paper */
-		color: var(--oi-yellow);
-		filter: drop-shadow(1px 0 0 var(--ink)) drop-shadow(-1px 0 0 var(--ink)) drop-shadow(0 1px 0 var(--ink)) drop-shadow(0 -1px 0 var(--ink));
+		/* Theme accent purple (the site's annotation colour), a touch deeper so it reads as text */
+		color: color-mix(in srgb, var(--accent) 80%, var(--ink));
 		font: 700 0.9rem / 1.2 var(--font-display);
 		white-space: nowrap;
 		pointer-events: none;

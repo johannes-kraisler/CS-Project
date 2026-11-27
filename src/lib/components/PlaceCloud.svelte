@@ -194,19 +194,21 @@
 <style>
 	.you path {
 		fill: none;
-		stroke: var(--oi-yellow);
+		stroke: color-mix(in srgb, var(--accent) 80%, var(--ink));
 		stroke-width: 3;
 		stroke-linecap: round;
 		stroke-linejoin: round;
 	}
 	.you text {
-		fill: var(--oi-yellow);
+		fill: color-mix(in srgb, var(--accent) 80%, var(--ink));
+		paint-order: stroke;
+		stroke: var(--surface);
+		stroke-width: 5px;
 		font: 700 20px var(--font-display);
 	}
 	.you {
 		pointer-events: none;
-		/* Page yellow (stars, highlighter) with a thin ink outline so it reads on the paper */
-		filter: drop-shadow(1px 0 0 var(--ink)) drop-shadow(-1px 0 0 var(--ink)) drop-shadow(0 1px 0 var(--ink)) drop-shadow(0 -1px 0 var(--ink));
+		/* Theme accent purple (the site's annotation colour), a touch deeper so it reads as text */
 		animation: you-pop 500ms var(--ease-out) 600ms backwards;
 	}
 	@keyframes you-pop {
