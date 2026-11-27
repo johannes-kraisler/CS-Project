@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
-	import { sceneIn, sceneOut } from '#lib/motion.js';
+	import { fade } from 'svelte/transition';
+	import { inview } from '#lib/inview.js';
 	import WordReveal from '#lib/components/WordReveal.svelte';
 	import CountUp from '#lib/components/CountUp.svelte';
 	import { csv } from 'd3';
@@ -122,12 +123,10 @@
 		{
 			scene: 'bars',
 			kicker: 'Our survey',
-			title: 'We conducted a survey among undergrad students (25 people)',
+			title: 'Only a third of students rate their mental health highly',
 			findings: [
-				'Only 32% of students (8 of 25) rate their mental health excellent or very good, compared with 52% of all Torontonians in the City survey. 28% (7) say fair or poor.',
-				'48% (12) feel strongly connected (4 or 5 out of 5) to the people at their favourite place to socialize; 28% (7) feel weakly connected (1 or 2).',
-				'The same link as in the City data: of the 7 students with fair or poor mental health, 5 feel weakly connected. Of the 8 with excellent or very good mental health, none do.',
-				'Click a bar to see the other chart for just those students. With 25 people, treat these as signals, not firm numbers.'
+				'Only 32% of students rate their mental health as excellent or very good. 28% say fair or poor.',
+				'48% feel strongly connected; 28% feel weakly connected.'
 			]
 		},
 		{
@@ -183,9 +182,27 @@
 
 	let active = $state(0);
 	let progress = $state(0); // 0–1 through the active step, drives the word reveal
-	let scene = $derived(steps[active].scene);
+
+	// Like Chapter 01: each kind of chart gets its own sticky section, so one chart scrolls off with its
+	// cards and the next scrolls on. The two line charts share one frame whose contents are rewritten
+	// in place when moving from mental health to time spent.
+	const idx = steps.map((_, i) => i);
+	/** @param {string[]} scenes */
+	const group = (...scenes) => idx.filter((i) => scenes.includes(steps[i].scene));
+	const sections = {
+		bars: group('bars'),
+		lines: group('lines', 'hours'),
+		message: group('message'),
+		map: group('map'),
+		cloud: group('cloud')
+	};
+	/** The step a section's chart shows: the active one if it's in the section, else its nearest end. */
+	const shownIn = (/** @type {number[]} */ s) =>
+		s.includes(active) ? active : active < s[0] ? s[0] : s[s.length - 1];
+	let lineScene = $derived(steps[shownIn(sections.lines)].scene);
+	let evidenceSeen = $state(false); // the evidence tiles animate in when first scrolled into view
 	/** @type {HTMLElement} */
-	let stepsEl;
+	let rootEl;
 
 	onMount(() => {
 		csv('/survey_0.csv', cleanRow)
@@ -197,7 +214,7 @@
 		const onResize = () => scroller?.resize();
 		// How far (0–1) the reader is through the active step, measured at the same 55% line as scrollama.
 		const onScroll = () => {
-			const el = stepsEl.querySelectorAll('.step')[active];
+			const el = rootEl.querySelectorAll('.step')[active];
 			if (!el) return;
 			const r = el.getBoundingClientRect();
 			progress = Math.min(1, Math.max(0, (innerHeight * 0.55 - r.top) / r.height));
@@ -206,7 +223,7 @@
 		import('scrollama').then(({ default: scrollama }) => {
 			scroller = scrollama();
 			scroller
-				.setup({ step: Array.from(stepsEl.querySelectorAll('.step')), offset: 0.55 })
+				.setup({ step: Array.from(rootEl.querySelectorAll('.step')), offset: 0.55 })
 				.onStepEnter((/** @type {{ index: number }} */ r) => {
 					active = r.index;
 					onScroll();
@@ -221,143 +238,11 @@
 	});
 </script>
 
-<section class="story" aria-label="Story: our survey of undergrad students">
-	<div class="graphic">
-		<div class="stage">
-			{#key scene}
-				<div class="scene" in:sceneIn out:sceneOut>
-					{#if scene === 'bars'}
-					<div class="toolbar">
-						<p class="count">
-							Showing <b>{filteredCount}</b> of {rows.length} students
-						</p>
-						{#each activeFilters as [field, value] (field)}
-							<button type="button" class="chip" onclick={() => toggle(field, value)} title="Remove this filter">
-								{filterLabel(field, value)} <span aria-hidden="true">×</span>
-							</button>
-						{/each}
-						<button type="button" class="clear" onclick={clear} disabled={!activeFilters.length}>Clear filters</button>
-					</div>
 
-					{#if error}
-						<p class="error">{error}</p>
-					{:else}
-						<div class="pair">
-							{#each views as view (view.field)}
-								<SurveyBars
-									{view}
-									rows={subset(view.field)}
-									total={rows.length}
-									selected={filters[view.field] ?? null}
-									colors={palettes[/** @type {'mentalHealth' | 'connection'} */ (view.field)]}
-									onselect={(v) => toggle(view.field, v)}
-								/>
-							{/each}
-						</div>
-					{/if}
-					{:else if scene === 'lines'}
-						<BelongingLines
-							id="students-mh"
-							compact
-							title="Belonging and mental health: our students"
-							intro=""
-							pickerLegend=""
-							points={mhPoints}
-							bind:selected={mhSelected}
-							yMax={115}
-							yTicks={[0, 25, 50, 75, 100]}
-							nouns={['student', 'students']}
-							lineLabels={['Strongly connected', 'Weakly connected']}
-							phrases={['strongly connected', 'weakly connected']}
-							heading={(label) => `Students with ${label.toLowerCase()} mental health`}
-						/>
-						<p class="note">
-							Columns: “In general, how would you rate your mental health?” and “How connected do you feel to
-							the people at this place? (1)”. Strongly connected = 4–5, weakly = 1–2 (out of 5). Click a
-							rating to see its numbers.
-						</p>
-					{:else if scene === 'hours'}
-						<BelongingLines
-							id="students-hours"
-							compact
-							title="Time spent at favourite place and belonging"
-							intro=""
-							pickerLegend=""
-							points={hoursPoints}
-							bind:selected={hoursSelected}
-							yMax={115}
-							yTicks={[0, 25, 50, 75, 100]}
-							nouns={['student', 'students']}
-							lineLabels={['Strongly connected', 'Weakly connected']}
-							phrases={['strongly connected', 'weakly connected']}
-							heading={(label) =>
-								`Students who spend ${HOURS_GROUPS.find((h) => h.label === label)?.detail ?? label} at their favourite place`}
-						/>
-						<p class="note">
-							Columns: “How many hours weekly do you spend here? (1)” and “How connected do you feel to the
-							people at this place? (1)”. Rarely = less than 3 hours a week, Occasionally = 3–5, Frequently =
-							5–8, Very frequently = more than 8. Strongly connected = 4–5, weakly = 1–2. Click a group to see
-							its numbers.
-						</p>
-					{:else if scene === 'message'}
-						<div class="evidence">
-							<section class="ev-group">
-								<h2>Mental health and belonging go hand in hand</h2>
-								<div class="tiles">
-									<div class="tile">
-										<p class="big"><span class="bad"><CountUp value={18} />%</span> vs <span class="good"><CountUp value={67} />%</span></p>
-										<p class="what">of Torontonians with poor vs excellent mental health feel a strong sense of belonging</p>
-										<p class="src">City survey · 7,222 residents</p>
-									</div>
-									<div class="tile">
-										<p class="big">
-											<span class="bad"><CountUp value={evidence.studentsFair} />%</span> vs <span class="good"><CountUp value={evidence.studentsExcellent} />%</span>
-										</p>
-										<p class="what">of students with fair vs excellent mental health feel strongly connected</p>
-										<p class="src">Our survey · {evidence.total} students</p>
-									</div>
-								</div>
-							</section>
-							<section class="ev-group">
-								<h2>Belonging needs a place to grow</h2>
-								<div class="tiles">
-									<div class="tile">
-										<p class="big"><span class="bad"><CountUp value={42} />%</span> → <span class="good"><CountUp value={70} />%</span></p>
-										<p class="what">strong belonging among Torontonians who never vs very frequently use community services</p>
-										<p class="src">City survey · 7,222 residents</p>
-									</div>
-									<div class="tile">
-										<p class="big">
-											<span class="bad"><CountUp value={evidence.studentsRarely} />%</span> → <span class="good"><CountUp value={evidence.studentsVeryOften} />%</span>
-										</p>
-										<p class="what">
-											of students strongly connected when they spend under 3 vs over 8 hours a week at their favourite place
-										</p>
-										<p class="src">Our survey · {evidence.total} students</p>
-									</div>
-									<div class="tile wide">
-										<p class="big"><span class="bad"><CountUp value={evidence.noPlacePct} />%</span></p>
-										<p class="what">
-											of students ({evidence.noPlace} of {evidence.total}) have no regular place to socialize outside home,
-											school and work
-										</p>
-										<p class="src">Our survey · column “Do you have a place you regularly go to socialize, outside of home, school, and work?”</p>
-									</div>
-								</div>
-							</section>
-						</div>
-					{:else if scene === 'map'}
-						<PlacesMap rows={subset(null)} total={rows.length} autoCampus />
-					{:else if scene === 'cloud'}
-						<PlaceCloud rows={subset(null)} total={rows.length} column={COLUMNS.placeType} />
-					{/if}
-				</div>
-			{/key}
-		</div>
-	</div>
-
-	<div class="steps" bind:this={stepsEl}>
-		{#each steps as s, i (i)}
+{#snippet cards(/** @type {number[]} */ section)}
+	<div class="steps">
+		{#each section as i (i)}
+			{@const s = steps[i]}
 			<div class="step" class:is-active={i === active} data-step={i}>
 				<div class="card" class:main={!!s.message}>
 					<div class="card-top">
@@ -390,9 +275,182 @@
 		{/each}
 		<div class="tail" aria-hidden="true"></div>
 	</div>
-</section>
+{/snippet}
+
+<div bind:this={rootEl} role="region" aria-label="Story: our survey of undergrad students">
+	<section class="story" aria-label="Our survey: mental health and belonging">
+		<div class="graphic">
+			<div class="stage">
+				<div class="scene">
+				<div class="toolbar">
+					<p class="count">
+						Showing <b>{filteredCount}</b> of {rows.length} students
+					</p>
+					{#each activeFilters as [field, value] (field)}
+						<button type="button" class="chip" onclick={() => toggle(field, value)} title="Remove this filter">
+							{filterLabel(field, value)} <span aria-hidden="true">×</span>
+						</button>
+					{/each}
+					<button type="button" class="clear" onclick={clear} disabled={!activeFilters.length}>Clear filters</button>
+				</div>
+
+				{#if error}
+					<p class="error">{error}</p>
+				{:else}
+					<div class="pair">
+						{#each views as view (view.field)}
+							<SurveyBars
+								{view}
+								rows={subset(view.field)}
+								total={rows.length}
+								selected={filters[view.field] ?? null}
+								colors={palettes[/** @type {'mentalHealth' | 'connection'} */ (view.field)]}
+								onselect={(v) => toggle(view.field, v)}
+							/>
+						{/each}
+					</div>
+				{/if}
+				</div>
+			</div>
+		</div>
+		{@render cards(sections.bars)}
+	</section>
+	<section class="story" aria-label="Our survey: belonging, mental health and time spent">
+		<div class="graphic">
+			<div class="stage">
+				<div class="scene">
+					<BelongingLines
+						id="students-lines"
+						compact
+						title={lineScene === 'lines'
+							? 'Belonging and mental health: our students'
+							: 'Time spent at favourite place and belonging'}
+						intro=""
+						pickerLegend=""
+						points={lineScene === 'lines' ? mhPoints : hoursPoints}
+						bind:selected={
+							() => (lineScene === 'lines' ? mhSelected : hoursSelected),
+							(v) => (lineScene === 'lines' ? (mhSelected = v) : (hoursSelected = v))
+						}
+						yMax={115}
+						yTicks={[0, 25, 50, 75, 100]}
+						nouns={['student', 'students']}
+						lineLabels={['Strongly connected', 'Weakly connected']}
+						phrases={['strongly connected', 'weakly connected']}
+						heading={lineScene === 'lines'
+							? (label) => `Students with ${label.toLowerCase()} mental health`
+							: (label) =>
+									`Students who spend ${HOURS_GROUPS.find((h) => h.label === label)?.detail ?? label} at their favourite place`}
+					/>
+					{#key lineScene}
+						<p class="note" in:fade={{ duration: 400, delay: 320 }}>
+							{#if lineScene === 'lines'}
+								Columns: “In general, how would you rate your mental health?” and “How connected do you feel to
+								the people at this place? (1)”. Strongly connected = 4–5, weakly = 1–2 (out of 5). Click a
+								rating to see its numbers.
+							{:else}
+								Columns: “How many hours weekly do you spend here? (1)” and “How connected do you feel to the
+								people at this place? (1)”. Rarely = less than 3 hours a week, Occasionally = 3–5, Frequently =
+								5–8, Very frequently = more than 8. Strongly connected = 4–5, weakly = 1–2. Click a group to see
+								its numbers.
+							{/if}
+						</p>
+					{/key}
+				</div>
+			</div>
+		</div>
+		{@render cards(sections.lines)}
+	</section>
+	<section class="story" aria-label="Main insight">
+		<div class="graphic">
+			<div class="stage">
+				<div class="scene">
+					<div class="evidence" class:seen={evidenceSeen} use:inview={() => (evidenceSeen = true)}>
+						<section class="ev-group">
+							<h2>Mental health and belonging go hand in hand</h2>
+							<div class="tiles">
+								<div class="tile">
+									<p class="big"><span class="bad"><CountUp value={evidenceSeen ? 18 : 0} />%</span> vs <span class="good"><CountUp value={evidenceSeen ? 67 : 0} />%</span></p>
+									<p class="what">of Torontonians with poor vs excellent mental health feel a strong sense of belonging</p>
+									<p class="src">City survey · 7,222 residents</p>
+								</div>
+								<div class="tile">
+									<p class="big">
+										<span class="bad"><CountUp value={evidenceSeen ? evidence.studentsFair : 0} />%</span> vs <span class="good"><CountUp value={evidenceSeen ? evidence.studentsExcellent : 0} />%</span>
+									</p>
+									<p class="what">of students with fair vs excellent mental health feel strongly connected</p>
+									<p class="src">Our survey · {evidence.total} students</p>
+								</div>
+							</div>
+						</section>
+						<section class="ev-group">
+							<h2>Belonging needs a place to grow</h2>
+							<div class="tiles">
+								<div class="tile">
+									<p class="big"><span class="bad"><CountUp value={evidenceSeen ? 42 : 0} />%</span> → <span class="good"><CountUp value={evidenceSeen ? 70 : 0} />%</span></p>
+									<p class="what">strong belonging among Torontonians who never vs very frequently use community services</p>
+									<p class="src">City survey · 7,222 residents</p>
+								</div>
+								<div class="tile">
+									<p class="big">
+										<span class="bad"><CountUp value={evidenceSeen ? evidence.studentsRarely : 0} />%</span> → <span class="good"><CountUp value={evidenceSeen ? evidence.studentsVeryOften : 0} />%</span>
+									</p>
+									<p class="what">
+										of students strongly connected when they spend under 3 vs over 8 hours a week at their favourite place
+									</p>
+									<p class="src">Our survey · {evidence.total} students</p>
+								</div>
+								<div class="tile wide">
+									<p class="big"><span class="bad"><CountUp value={evidenceSeen ? evidence.noPlacePct : 0} />%</span></p>
+									<p class="what">
+										of students ({evidence.noPlace} of {evidence.total}) have no regular place to socialize outside home,
+										school and work
+									</p>
+									<p class="src">Our survey · column “Do you have a place you regularly go to socialize, outside of home, school, and work?”</p>
+								</div>
+							</div>
+						</section>
+					</div>
+				</div>
+			</div>
+		</div>
+		{@render cards(sections.message)}
+	</section>
+	<section class="story" aria-label="Where the places are">
+		<div class="graphic">
+			<div class="stage">
+				<div class="scene">
+					<PlacesMap rows={subset(null)} total={rows.length} autoCampus />
+				</div>
+			</div>
+		</div>
+		{@render cards(sections.map)}
+	</section>
+	<section class="story" aria-label="Future actions">
+		<div class="graphic">
+			<div class="stage">
+				<div class="scene">
+					<PlaceCloud rows={subset(null)} total={rows.length} column={COLUMNS.placeType} />
+				</div>
+			</div>
+		</div>
+		{@render cards(sections.cloud)}
+	</section>
+</div>
 
 <style>
+	/* As in Chapter 01: each chart centres in its sticky panel */
+	.graphic .stage {
+		height: 100%;
+	}
+	.graphic .scene {
+		align-self: center;
+	}
+	@media (max-width: 900px) {
+		.graphic .scene {
+			align-self: start;
+		}
+	}
 	.evidence {
 		display: grid;
 		gap: 1.5rem;
@@ -424,21 +482,25 @@
 		border: 2px solid var(--ink);
 		border-radius: var(--wobble);
 		box-shadow: var(--shadow);
+		opacity: 0;
+	}
+	.seen .tile {
+		opacity: 1;
 		animation: tile-in 700ms var(--ease-out) backwards;
 	}
-	.tile:nth-child(2) {
+	.seen .tile:nth-child(2) {
 		animation-delay: 120ms;
 	}
-	.tile:nth-child(3) {
+	.seen .tile:nth-child(3) {
 		animation-delay: 240ms;
 	}
-	.ev-group + .ev-group .tile {
+	.seen .ev-group + .ev-group .tile {
 		animation-delay: 300ms;
 	}
-	.ev-group + .ev-group .tile:nth-child(2) {
+	.seen .ev-group + .ev-group .tile:nth-child(2) {
 		animation-delay: 420ms;
 	}
-	.ev-group + .ev-group .tile:nth-child(3) {
+	.seen .ev-group + .ev-group .tile:nth-child(3) {
 		animation-delay: 540ms;
 	}
 	@keyframes tile-in {
