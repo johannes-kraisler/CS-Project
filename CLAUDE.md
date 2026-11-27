@@ -63,7 +63,10 @@ count before and after.
   health be improved…" → line charts → "So, Belonging and Community Services…" → third-spaces
   slide with Ray Oldenburg.
 - Chapter 02 currently runs: opener → "How about you?" quiz → survey bars → line charts → map →
-  main-insight statement → word cloud with the "no third space" figure.
+  "Mental health and belonging go hand in hand…" → "Without 3rd Spaces…" with the "no regular
+  place to socialize" figure → word cloud.
+- `Interlude` can show extra content under its statement (pass it as children), as the
+  "Without 3rd Spaces…" slide does with its figure.
 
 ## Data rules
 
@@ -98,23 +101,28 @@ work.
 - Long free-text names are shortened for display (`NAME_SHORT`), e.g. "Cool events".
 - `PLACE_TYPES` and `PLACE_STYLE` are the single source of group names, order and colours. The
   word cloud, the map and the quiz must all read from them.
-- The "no third space" figure counts the **Not a third space** group. Do not use the separate
+- The "no regular place to socialize" figure counts the **Not a third space** group. Do not use the separate
   yes/no question "Do you have a place you regularly go to socialize…?": many students answered
   "No" while still naming a café, park or lounge.
 
+## Bar-chart filters
+
+Clicking a bar in Chapter 02's first two charts filters **only the other bar chart**. The line
+charts, the map and the word cloud always show all students (plus the reader, if added).
+
 ## The reader's answers (quiz)
 
-- `YourAnswers` asks the three survey questions. When the reader adds their answers, they become
+- `YourAnswers` asks four of the survey's questions: mental health, connection, favourite place
+  (by third-space group, or "No place") and weekly time spent there (the time-spent chart's groups). When the reader adds their answers, they become
   one extra row (`id: -1`) in Chapter 02's data.
 - The answers live in memory only. Never store them, send them anywhere, or keep them across a
   refresh.
 - Every Chapter 02 figure that depends on the data must stay live: the charts, the first card's
-  percentages, the "no third space" figure and the closing paragraph. Use `$derived` values or
+  percentages, the "no regular place to socialize" figure and the closing paragraph. Use `$derived` values or
   getters, not hard-coded numbers.
 - Charts mark the reader's answer with a hand-drawn arrow and "you are here". The marker must
   never overlap labels, numbers, titles or other bubbles; check this with a screenshot.
-- The quiz does not ask about hours or location, so the time-spent chart and the map show no
-  marker.
+- The quiz does not ask for a location, so the map shows no marker.
 
 ## Visual design
 

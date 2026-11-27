@@ -6,7 +6,7 @@
 	 * questions; once added, their answers count as one extra student in every chart below.
 	 * Nothing is saved: the parent keeps it in memory only, so a page refresh erases it.
 	 * @type {{
-	 *   onchange: (you: { mentalHealth: string, connection: number, placeType: string } | null) => void,
+	 *   onchange: (you: { mentalHealth: string, connection: number, placeType: string, hours: string } | null) => void,
 	 *   total: number
 	 * }}
 	 */
@@ -20,11 +20,11 @@
 		{ value: 4, label: 'Quite connected' },
 		{ value: 5, label: 'Very connected' }
 	];
-	// Same groups as the bubbles in the favourite-places chart; anything that isn't a third space
-	// (home, library, school or work) goes in one last option
+	// Same groups as the bubbles in the favourite-places chart, plus "No place" for readers without
+	// a third space (counted in the "Not a third space" group)
 	const placeOptions = PLACE_TYPES.map((t) => ({
 		value: t,
-		label: t === NOT_THIRD ? 'Somewhere else (home, library, school…)' : t
+		label: t === NOT_THIRD ? 'No place' : t
 	}));
 
 	/** @type {string | null} */
@@ -35,7 +35,17 @@
 	let placeType = $state(null);
 	let added = $state(false);
 
-	let complete = $derived(mentalHealth != null && connection != null && placeType != null);
+	// Same four groups (and underlying survey answers) as the time-spent chart
+	const hoursOptions = [
+		{ value: 'Less than 3 hours', label: 'Rarely (less than 3 hours)' },
+		{ value: '3–5 hours', label: 'Occasionally (3–5 hours)' },
+		{ value: '5–8 hours', label: 'Frequently (5–8 hours)' },
+		{ value: 'More than 8 hours', label: 'Very frequently (more than 8 hours)' }
+	];
+	/** @type {string | null} */
+	let hours = $state(null);
+
+	let complete = $derived(mentalHealth != null && connection != null && placeType != null && hours != null);
 
 	// Once added, changing an answer updates the charts straight away.
 	$effect(() => {
@@ -43,14 +53,15 @@
 			onchange({
 				mentalHealth: /** @type {string} */ (mentalHealth),
 				connection: /** @type {number} */ (connection),
-				placeType: /** @type {string} */ (placeType)
+				placeType: /** @type {string} */ (placeType),
+				hours: /** @type {string} */ (hours)
 			});
 		}
 	});
 
 	const remove = () => {
 		added = false;
-		mentalHealth = connection = placeType = null;
+		mentalHealth = connection = placeType = hours = null;
 		onchange(null);
 	};
 </script>
@@ -60,7 +71,7 @@
 		<p class="kicker mono"><span class="hl-marker">Your turn</span></p>
 		<h2 id="quiz-title">How about you?</h2>
 		<p class="intro">
-			Answer the same three questions we asked the students.
+			Answer the same four questions we asked the students.
 		</p>
 
 		<fieldset>
@@ -99,13 +110,25 @@
 			</div>
 		</fieldset>
 
+		<fieldset>
+			<legend>4. How much time do you spend at your favourite third space each week?</legend>
+			<div class="options">
+				{#each hoursOptions as o (o.value)}
+					<label class="opt" class:on={hours === o.value}>
+						<input type="radio" name="q-hours" value={o.value} bind:group={hours} />
+						{o.label}
+					</label>
+				{/each}
+			</div>
+		</fieldset>
+
 		<div class="actions" aria-live="polite">
 			{#if !added}
 				<button type="button" class="add" disabled={!complete} onclick={() => (added = true)}>
 					Add me to the charts ↓
 				</button>
 				{#if !complete}
-					<span class="hint">Answer all three to continue.</span>
+					<span class="hint">Answer all four to continue.</span>
 				{/if}
 			{:else}
 				<p class="done">

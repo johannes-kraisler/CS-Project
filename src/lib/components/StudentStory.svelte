@@ -25,13 +25,13 @@
 	/** @type {import('#lib/survey0.js').Response | null} */
 	let you = $state(null);
 	let rows = $derived(you ? [...surveyRows, you] : surveyRows);
-	/** @param {{ mentalHealth: string, connection: number, placeType: string } | null} a */
+	/** @param {{ mentalHealth: string, connection: number, placeType: string, hours: string } | null} a */
 	const setYou = (a) =>
 		(you = a && {
 			id: -1,
 			loneliness: null,
 			placeName: 'You',
-			hours: null,
+			hours: a.hours,
 			created: null,
 			age: null,
 			mentalHealth: a.mentalHealth,
@@ -71,10 +71,9 @@
 	};
 
 	// Step 2: % strongly (4-5) / weakly (1-2) connected at each mental health rating.
-	// Mental health and connection define this chart's axes, so their filters don't apply to it;
-	// any other filter does.
+	// Always all students: clicking a bar filters only the other bar chart, never the later charts.
 	let mhPoints = $derived.by(() => {
-		const base = subset(['mentalHealth', 'connection']);
+		const base = rows;
 		return (mentalHealthView?.categories ?? []).map((m) => {
 			const g = base.filter((r) => r.mentalHealth === m && r.connection != null);
 			const pct = (/** @type {(c: number) => boolean} */ test) =>
@@ -93,7 +92,7 @@
 		{ value: 'More than 8 hours', label: 'Very frequently', detail: 'more than 8 hours a week' }
 	];
 	let hoursPoints = $derived.by(() => {
-		const base = subset(['hours', 'connection']);
+		const base = rows; // all students, like the chart above
 		return HOURS_GROUPS.map((h) => {
 			const g = base.filter((r) => r.hours === h.value && r.connection != null);
 			const pct = (/** @type {(c: number) => boolean} */ test) =>
@@ -102,6 +101,15 @@
 		});
 	});
 	let hoursSelected = $state('Very frequently');
+
+	// The reader's point on the line chart now showing: their mental health rating, or their
+	// time-spent group, with their connection score deciding which line the arrow points at
+	let youLine = $derived.by(() => {
+		if (!you || you.connection == null) return null;
+		const label =
+			lineScene === 'lines' ? you.mentalHealth : HOURS_GROUPS.find((h) => h.value === you?.hours)?.label;
+		return label ? { label, connection: you.connection } : null;
+	});
 
 	// Share of students whose favourite place is not a third space (home, school, library or
 	// nowhere), shown above the word cloud. Based on the place grouping, not the separate yes/no
@@ -354,9 +362,7 @@
 						phrases={['strongly connected', 'weakly connected']}
 						xLabel={lineScene === 'lines' ? 'Self-rated mental health' : 'Time spent at favourite Third Space each week'}
 						namedBand={lineScene === 'hours'}
-						you={lineScene === 'lines' && you?.mentalHealth && you.connection != null
-							? { label: you.mentalHealth, connection: you.connection }
-							: null}
+						you={youLine}
 						heading={lineScene === 'lines'
 							? (label) => `Students with ${label.toLowerCase()} mental health`
 							: (label) =>
@@ -371,33 +377,33 @@
 		<div class="graphic">
 			<div class="stage">
 				<div class="scene">
-					<PlacesMap rows={subset(null)} total={rows.length} autoCampus />
+					<PlacesMap {rows} total={rows.length} autoCampus />
 				</div>
 			</div>
 		</div>
 		{@render cards(sections.map)}
 	</section>
-	<!-- Main insight as a full-screen statement, in the same style as the chapter 01 questions -->
+	<!-- Main insight, as two full-screen statements in the same style as the chapter 01 questions -->
 	<Interlude
 		small
 		lower
 		highlight="marked"
-		text={"Mental health and belonging go hand in hand,\nand belonging needs a place to grow.\n[[Without third spaces, many people's\nmental health could be in trouble.]]"}
+		text={"Mental health and belonging [[go hand in hand]],\nand belonging [[needs a place to grow]]"}
 	/>
+
+	<Interlude small highlight="all" text={"Without 3rd Spaces, many people's\nmental health could be in trouble…"}>
+		<!-- Live: counts the "Not a third space" group, including the reader's quiz answer -->
+		<div class="tile" class:seen={evidenceSeen} use:inview={() => (evidenceSeen = true)}>
+			<p class="big"><span class="bad"><CountUp value={evidenceSeen ? evidence.noPlacePct : 0} />%</span></p>
+			<p class="what">of students reported no regular place to socialize outside of home, school, and work…</p>
+		</div>
+	</Interlude>
 
 	<section class="story" aria-label="Future actions">
 		<div class="graphic">
 			<div class="stage">
 				<div class="scene">
-					<!-- The one figure kept from the old "main insight" page -->
-					<div class="tile" class:seen={evidenceSeen} use:inview={() => (evidenceSeen = true)}>
-						<p class="big"><span class="bad"><CountUp value={evidenceSeen ? evidence.noPlacePct : 0} />%</span></p>
-						<p class="what">
-							of students ({evidence.noPlace} of {evidence.total}) have no third space: their favourite place to socialize
-							is home, school, a library, or nowhere at all
-						</p>
-					</div>
-					<PlaceCloud rows={subset(null)} total={rows.length} column={COLUMNS.placeType} />
+					<PlaceCloud {rows} total={rows.length} column={COLUMNS.placeType} />
 				</div>
 			</div>
 		</div>
@@ -418,12 +424,13 @@
 			align-self: start;
 		}
 	}
-	/* "Have no third space" figure above the word cloud: number left, words right */
+	/* "No regular place to socialize" figure under the main-insight statement: number left, words right */
 	.tile {
+		max-width: 40rem;
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		padding: 0.8rem 1.2rem;
+		padding: 1rem 1.6rem;
 		background: var(--surface);
 		border: 2px solid var(--ink);
 		border-radius: var(--wobble);
@@ -444,13 +451,13 @@
 		margin: 0;
 	}
 	.big {
-		font: 700 clamp(2.6rem, 5vw, 3.6rem) / 0.95 var(--font-display);
+		font: 700 clamp(3rem, 6vw, 4.6rem) / 0.95 var(--font-display);
 	}
 	.big .bad {
 		color: var(--bad-2);
 	}
 	.what {
-		font-size: 1rem;
+		font-size: clamp(1.05rem, 1.6vw, 1.3rem);
 		line-height: 1.4;
 	}
 	.para {

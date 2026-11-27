@@ -12,9 +12,10 @@
 	 * It rises in, the stars draw themselves, and the words get highlighted once it is in view.
 	 * A newline (\n) in `text` forces a line break; `highlight` works as in WordReveal.
 	 * `small` uses slightly smaller lettering, for longer statements; `lower` sits the text a bit lower.
-	 * @type {{ text: string, highlight?: 'all' | 'last-line' | 'none' | 'marked', small?: boolean, lower?: boolean }}
+	 * @type {{ text: string, highlight?: 'all' | 'last-line' | 'none' | 'marked', small?: boolean, lower?: boolean, children?: import('svelte').Snippet }}
 	 */
-	let { text, highlight = 'last-line', small = false, lower = false } = $props();
+	// `children` (optional) is shown under the statement, e.g. a figure
+	let { text, highlight = 'last-line', small = false, lower = false, children } = $props();
 
 	const reveal = new Tween(0, { duration: 2000, easing: cubicInOut });
 
@@ -49,7 +50,10 @@
 		<path pathLength="1" d="M50 8 L58 40 L92 42 L64 60 L76 92 L50 72 L24 92 L36 60 L8 42 L42 40 Z" />
 	</svg>
 
-	<p class="statement" class:small><WordReveal {text} progress={reveal.current} start={0} end={1} {highlight} /></p>
+	<div class="content">
+		<p class="statement" class:small><WordReveal {text} progress={reveal.current} start={0} end={1} {highlight} /></p>
+		{@render children?.()}
+	</div>
 </section>
 
 <style>
@@ -72,8 +76,13 @@
 		overflow: hidden;
 		pointer-events: none;
 	}
-	.statement {
+	.content {
 		position: relative; /* above the sketch */
+		display: grid;
+		justify-items: center;
+		gap: 2.5rem;
+	}
+	.statement {
 		margin: 0;
 		text-align: center;
 		/* Same lettering size as the "Wellbeing and Belonging" title */
