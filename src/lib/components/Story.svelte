@@ -4,6 +4,8 @@
 	import WordReveal from '#lib/components/WordReveal.svelte';
 	import BarChart from '#lib/components/BarChart.svelte';
 	import BelongingLines from '#lib/components/BelongingLines.svelte';
+	import Interlude from '#lib/components/Interlude.svelte';
+	import ThirdSpaces from '#lib/components/ThirdSpaces.svelte';
 
 	/**
 	 * Scrollytelling storyboard: a sticky chart panel that changes as text steps scroll past
@@ -182,6 +184,8 @@
 		{@render cards(chapters[0])}
 	</section>
 
+	<Interlude text={'So, how can\nmental health be improved\nfor younger Torontonians?'} />
+
 	<section class="story">
 		<div class="graphic">
 			<div class="stage">
@@ -204,6 +208,13 @@
 		</div>
 		{@render cards(chapters[1])}
 	</section>
+
+	<Interlude
+		small
+		text={'So, Belonging and Community Services\nmay improve mental health\nfor younger Torontonians;\nhow can these be increased?'}
+	/>
+
+	<ThirdSpaces />
 </div>
 
 <style>

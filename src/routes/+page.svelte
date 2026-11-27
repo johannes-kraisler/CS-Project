@@ -56,8 +56,8 @@
 	<div class="hero-inner">
 		<p class="mono eyebrow"><span class="hl-marker">City of Toronto Public Survey · weighted results</span></p>
 		<h1>
-			<span class="line">Wellbeing and community</span>
-			<span class="em">by age</span>
+			<span class="line">Wellbeing and Belonging</span>
+			<span class="em">by Age</span>
 		</h1>
 		<p class="deck">
 			How mental health and a sense of belonging change across Toronto, and where students find their
@@ -159,7 +159,7 @@
 		color: var(--ink);
 	}
 	h1 {
-		/* Sized so "Wellbeing and community" always fits on one line */
+		/* Sized so "Wellbeing and Belonging" always fits on one line */
 		font: 700 min(8.5rem, 9.2vw) / 0.82 var(--font-display);
 		text-align: center; /* "by age" sits centred under the title */
 		animation-delay: 120ms !important;
